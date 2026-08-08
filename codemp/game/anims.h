@@ -997,6 +997,8 @@ typedef enum //# animNumber_e
 	BOTH_SABERSLOW_STANCE,
 	BOTH_SABERDUAL_STANCE,
 	BOTH_SABERSTAFF_STANCE,
+	BOTH_SABERTAVION_STANCE, // Niksata Edit
+	BOTH_SABERDESANN_STANCE, // Niksata Edit
 	BOTH_A2_STABBACK1,		//# Stab saber backward
 	BOTH_ATTACK_BACK,		//# Swing around backwards and attack
 	BOTH_JUMPFLIPSLASHDOWN1,//#
@@ -1056,6 +1058,7 @@ typedef enum //# animNumber_e
 	BOTH_A6_SABERPROTECT,
 	BOTH_A7_SOULCAL,
 	BOTH_A1_SPECIAL,
+	BOTH_A1_SPECIAL_YODA, // Niksata Edit
 	BOTH_A2_SPECIAL,
 	BOTH_A3_SPECIAL,
 	BOTH_ROLL_STAB,

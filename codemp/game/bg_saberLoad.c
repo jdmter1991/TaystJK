@@ -119,6 +119,7 @@ stringID_table_t saberMoveTable[] = {
 	ENUM2STRING( LS_DUAL_SPIN_PROTECT ),
 	ENUM2STRING( LS_STAFF_SOULCAL ),
 	ENUM2STRING( LS_A1_SPECIAL ),
+	ENUM2STRING(LS_A1_SPECIAL_YODA), // Niksata Edit
 	ENUM2STRING( LS_A2_SPECIAL ),
 	ENUM2STRING( LS_A3_SPECIAL ),
 	ENUM2STRING( LS_UPSIDE_DOWN_ATTACK ),
@@ -259,144 +260,143 @@ qboolean WP_SaberBladeDoTransitionDamage( saberInfo_t *saber, int bladeNum ) {
 	return qfalse;
 }
 
-qboolean WP_UseFirstValidSaberStyle( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int *saberAnimLevel ) {
+qboolean WP_UseFirstValidSaberStyle(saberInfo_t* saber1, saberInfo_t* saber2, int saberHolstered, int* saberAnimLevel) { // Niksata Edit
 	qboolean styleInvalid = qfalse;
 	qboolean saber1Active, saber2Active;
 	qboolean dualSabers = qfalse;
-	int	validStyles=0, styleNum;
+	int validStyles = 0, styleNum;
 
-	if ( saber2 && saber2->model[0] )
+	if (saber2 && saber2->model[0])
 		dualSabers = qtrue;
 
-	//dual
-	if ( dualSabers ) {
-		if ( saberHolstered > 1 )
+	// Determine active sabers
+	if (dualSabers) {
+		if (saberHolstered > 1)
 			saber1Active = saber2Active = qfalse;
-		else if ( saberHolstered > 0 ) {
+		else if (saberHolstered > 0) {
 			saber1Active = qtrue;
 			saber2Active = qfalse;
 		}
 		else
 			saber1Active = saber2Active = qtrue;
 	}
-	// single/staff
 	else {
 		saber2Active = qfalse;
-		if ( !saber1 || !saber1->model[0] )
+		if (!saber1 || !saber1->model[0])
 			saber1Active = qfalse;
-		//staff
-		else if ( saber1->numBlades > 1 ) {
-			if ( saberHolstered > 1 )
+		else if (saber1->numBlades > 1) {
+			if (saberHolstered > 1)
 				saber1Active = qfalse;
 			else
 				saber1Active = qtrue;
 		}
-		//single
 		else {
-			if ( saberHolstered )
+			if (saberHolstered)
 				saber1Active = qfalse;
 			else
 				saber1Active = qtrue;
 		}
 	}
 
-	//initially, all styles are valid
-	validStyles = (1<<SS_NUM_SABER_STYLES)-2; // mask off 1<<SS_NONE
+	// Initially, all styles are valid // Niksata Edit
+	validStyles = (1 << SS_NUM_SABER_STYLES) - 2; // Mask off 1 << SS_NONE
 
-	// check for invalid styles
-	if ( saber1Active && saber1 && saber1->model[0] && saber1->stylesForbidden ) {
-		if ( (saber1->stylesForbidden & (1<<*saberAnimLevel)) ) {
-			//not a valid style for first saber!
+	// Add Desann and Tavion styles
+	validStyles |= (1 << SS_TAVION);
+	validStyles |= (1 << SS_DESANN); // Niksata Edit
+
+	// Check for forbidden styles in saber1
+	if (saber1Active && saber1 && saber1->model[0] && saber1->stylesForbidden) {
+		if ((saber1->stylesForbidden & (1 << *saberAnimLevel))) {
 			styleInvalid = qtrue;
 			validStyles &= ~saber1->stylesForbidden;
 		}
 	}
-	if ( dualSabers ) {
-		if ( saber2Active && saber2->stylesForbidden ) {
-			if ( (saber2->stylesForbidden & (1<<*saberAnimLevel)) ) {
-				//not a valid style for second saber!
+
+	// Check for forbidden styles in saber2
+	if (dualSabers) {
+		if (saber2Active && saber2->stylesForbidden) {
+			if ((saber2->stylesForbidden & (1 << *saberAnimLevel))) {
 				styleInvalid = qtrue;
-				//only the ones both sabers allow is valid
 				validStyles &= ~saber2->stylesForbidden;
 			}
 		}
 	}
 
-	if ( !validStyles ) {
-		if ( dualSabers )
-			Com_Printf( "WARNING: No valid saber styles for %s/%s", saber1->name, saber2->name );
+	if (!validStyles) {
+		if (dualSabers)
+			Com_Printf("WARNING: No valid saber styles for %s/%s\n", saber1->name, saber2->name);
 		else
-			Com_Printf( "WARNING: No valid saber styles for %s", saber1->name );
+			Com_Printf("WARNING: No valid saber styles for %s\n", saber1->name);
 	}
-
-	//using an invalid style and have at least one valid style to use, so switch to it
-	else if ( styleInvalid ) {
-		for ( styleNum=SS_FAST; styleNum<SS_NUM_SABER_STYLES; styleNum++ ) {
-			if ( (validStyles & (1<<styleNum)) ) {
+	else if (styleInvalid) {
+		for (styleNum = SS_FAST; styleNum < SS_NUM_SABER_STYLES; styleNum++) {
+			if (validStyles & (1 << styleNum)) {
 				*saberAnimLevel = styleNum;
 				return qtrue;
 			}
 		}
 	}
 	return qfalse;
-}
+} // Niksata Edit
 
-qboolean WP_SaberStyleValidForSaber( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int saberAnimLevel ) {
-	qboolean saber1Active, saber2Active;
+qboolean WP_SaberStyleValidForSaber(saberInfo_t* saber1, saberInfo_t* saber2, int saberHolstered, int saberAnimLevel) { // Niksata Edit
+	qboolean saber1Active = qfalse, saber2Active = qfalse;
 	qboolean dualSabers = qfalse;
 
-	if ( saber2 && saber2->model[0] )
+	if (saber2 && saber2->model[0]) {
 		dualSabers = qtrue;
+	}
 
-	if ( dualSabers ) {
-		if ( saberHolstered > 1 )
+	if (dualSabers) {
+		if (saberHolstered > 1) {
 			saber1Active = saber2Active = qfalse;
-		else if ( saberHolstered > 0 ) {
+		}
+		else if (saberHolstered > 0) {
 			saber1Active = qtrue;
 			saber2Active = qfalse;
 		}
-		else
+		else {
 			saber1Active = saber2Active = qtrue;
+		}
 	}
 	else {
 		saber2Active = qfalse;
-		if ( !saber1 || !saber1->model[0] )
+		if (!saber1 || !saber1->model[0]) {
 			saber1Active = qfalse;
-
-		//staff
-		else if ( saber1->numBlades > 1 )
-			saber1Active = (saberHolstered>1) ? qfalse : qtrue;
-
-		//single
-		else
-			saber1Active = saberHolstered ? qfalse : qtrue;
-	}
-
-	if ( saber1Active && saber1 && saber1->model[0] && saber1->stylesForbidden ) {
-		if ( (saber1->stylesForbidden & (1<<saberAnimLevel)) )
-			return qfalse;
-	}
-	if ( dualSabers && saber2Active && saber2 && saber2->model[0] )
-	{
-		if ( saber2->stylesForbidden ) {
-			if ( (saber2->stylesForbidden & (1<<saberAnimLevel)) )
-				return qfalse;
 		}
-		//now: if using dual sabers, only dual and tavion (if given with this saber) are allowed
-		if ( saberAnimLevel != SS_DUAL ) {
-			if ( saberAnimLevel != SS_TAVION )
+		else if (saber1->numBlades > 1) {
+			saber1Active = (saberHolstered > 1) ? qfalse : qtrue;
+		}
+		else {
+			saber1Active = saberHolstered ? qfalse : qtrue;
+		}
+	}
+
+	if (saber1Active && saber1 && saber1->model[0] && saber1->stylesForbidden) {
+		if ((saber1->stylesForbidden & (1 << saberAnimLevel))) {
+			return qfalse;
+		}
+	}
+
+	if (dualSabers && saber2Active && saber2 && saber2->model[0]) {
+		if (saber2->stylesForbidden) {
+			if ((saber2->stylesForbidden & (1 << saberAnimLevel))) {
 				return qfalse;
-			else {
-				//see if "tavion" style is okay
-				if ( !(saber1Active && (saber1->stylesLearned & (1<<SS_TAVION)))
-					|| !(saber2->stylesLearned & (1<<SS_TAVION)) )
-					return qfalse;
 			}
 		}
+		// Allow style change only if the second saber is holstered
+		if (saberHolstered > 0) {
+			// Check if the style is valid for the second saber
+			if (saber2->stylesLearned & (1 << saberAnimLevel)) {
+				return qtrue; // swap with false to allow dual saber style switching
+			}
+		}
+		return qfalse; // swap with true to allow dual saber style switching
 	}
 
 	return qtrue;
-}
+} // Niksata Edit
 
 qboolean WP_SaberCanTurnOffSomeBlades( saberInfo_t *saber ) {
 	if ( saber->bladeStyle2Start > 0 && saber->numBlades > saber->bladeStyle2Start ) {

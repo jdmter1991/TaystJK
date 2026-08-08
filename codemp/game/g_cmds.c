@@ -3899,34 +3899,34 @@ void Cmd_ToggleSaber_f(gentity_t *ent)
 extern vmCvar_t		d_saberStanceDebug;
 
 extern qboolean WP_SaberCanTurnOffSomeBlades( saberInfo_t *saber );
-void Cmd_SaberAttackCycle_f(gentity_t *ent)
+void Cmd_SaberAttackCycle_f(gentity_t* ent) // Niksata Edit
 {
 	int selectLevel = 0;
 	qboolean usingSiegeStyle = qfalse;
 
-	if ( !ent || !ent->client )
+	if (!ent || !ent->client)
 	{
 		return;
 	}
 
-	if ( level.intermissionQueued || level.intermissiontime )
+	if (level.intermissionQueued || level.intermissiontime)
 	{
-		trap->SendServerCommand( ent-g_entities, va( "print \"%s (saberAttackCycle)\n\"", G_GetStringEdString( "MP_SVGAME", "CANNOT_TASK_INTERMISSION" ) ) );
+		trap->SendServerCommand(ent - g_entities, va("print \"%s (saberAttackCycle)\n\"", G_GetStringEdString("MP_SVGAME", "CANNOT_TASK_INTERMISSION")));
 		return;
 	}
 
-	if ( ent->health <= 0
-			|| ent->client->tempSpectate >= level.time
-			|| ent->client->sess.sessionTeam == TEAM_SPECTATOR )
+	if (ent->health <= 0
+		|| ent->client->tempSpectate >= level.time
+		|| ent->client->sess.sessionTeam == TEAM_SPECTATOR)
 	{
-		trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "MUSTBEALIVE" ) ) );
+		trap->SendServerCommand(ent - g_entities, va("print \"%s\n\"", G_GetStringEdString("MP_SVGAME", "MUSTBEALIVE")));
 		return;
 	}
 
 
-	if ( ent->client->ps.weapon != WP_SABER )
+	if (ent->client->ps.weapon != WP_SABER)
 	{
-        return;
+		return;
 	}
 	/*
 	if (ent->client->ps.weaponTime > 0)
@@ -3937,9 +3937,9 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent)
 
 	if (ent->client->saber[0].model[0] && ent->client->saber[1].model[0])
 	{ //no cycling for akimbo
-		if ( WP_SaberCanTurnOffSomeBlades( &ent->client->saber[1] ) )
+		if (WP_SaberCanTurnOffSomeBlades(&ent->client->saber[1]))
 		{//can turn second saber off
-			if ( ent->client->ps.saberHolstered == 1 )
+			if (ent->client->ps.saberHolstered == 1)
 			{//have one holstered
 				//unholster it
 				G_Sound(ent, CHAN_AUTO, ent->client->saber[1].soundOn);
@@ -3947,13 +3947,13 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent)
 				//g_active should take care of this, but...
 				ent->client->ps.fd.saberAnimLevel = SS_DUAL;
 			}
-			else if ( ent->client->ps.saberHolstered == 0 )
+			else if (ent->client->ps.saberHolstered == 0)
 			{//have none holstered
-				if ( (ent->client->saber[1].saberFlags2&SFL2_NO_MANUAL_DEACTIVATE) )
+				if ((ent->client->saber[1].saberFlags2 & SFL2_NO_MANUAL_DEACTIVATE))
 				{//can't turn it off manually
 				}
-				else if ( ent->client->saber[1].bladeStyle2Start > 0
-					&& (ent->client->saber[1].saberFlags2&SFL2_NO_MANUAL_DEACTIVATE2) )
+				else if (ent->client->saber[1].bladeStyle2Start > 0
+					&& (ent->client->saber[1].saberFlags2 & SFL2_NO_MANUAL_DEACTIVATE2))
 				{//can't turn it off manually
 				}
 				else
@@ -3962,27 +3962,27 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent)
 					G_Sound(ent, CHAN_AUTO, ent->client->saber[1].soundOff);
 					ent->client->ps.saberHolstered = 1;
 					//g_active should take care of this, but...
-					ent->client->ps.fd.saberAnimLevel = SS_FAST;
+					ent->client->ps.fd.saberAnimLevel = SS_STRONG;
 				}
 			}
 
 			if (d_saberStanceDebug.integer)
 			{
-				trap->SendServerCommand( ent-g_entities, va("print \"SABERSTANCEDEBUG: Attempted to toggle dual saber blade.\n\"") );
+				trap->SendServerCommand(ent - g_entities, va("print \"SABERSTANCEDEBUG: Attempted to toggle dual saber blade.\n\""));
 			}
 			return;
 		}
 	}
 	else if (ent->client->saber[0].numBlades > 1
-		&& WP_SaberCanTurnOffSomeBlades( &ent->client->saber[0] ) )
+		&& WP_SaberCanTurnOffSomeBlades(&ent->client->saber[0]))
 	{ //use staff stance then.
-		if ( ent->client->ps.saberHolstered == 1 )
+		if (ent->client->ps.saberHolstered == 1)
 		{//second blade off
-			if ( ent->client->ps.saberInFlight )
+			if (ent->client->ps.saberInFlight)
 			{//can't turn second blade back on if it's in the air, you naughty boy!
 				if (d_saberStanceDebug.integer)
 				{
-					trap->SendServerCommand( ent-g_entities, va("print \"SABERSTANCEDEBUG: Attempted to toggle staff blade in air.\n\"") );
+					trap->SendServerCommand(ent - g_entities, va("print \"SABERSTANCEDEBUG: Attempted to toggle staff blade in air.\n\""));
 				}
 				return;
 			}
@@ -3990,10 +3990,10 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent)
 			G_Sound(ent, CHAN_AUTO, ent->client->saber[0].soundOn);
 			ent->client->ps.saberHolstered = 0;
 			//g_active should take care of this, but...
-			if ( ent->client->saber[0].stylesForbidden )
+			if (ent->client->saber[0].stylesForbidden)
 			{//have a style we have to use
-				WP_UseFirstValidSaberStyle( &ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, &selectLevel );
-				if ( ent->client->ps.weaponTime <= 0 )
+				WP_UseFirstValidSaberStyle(&ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, &selectLevel);
+				if (ent->client->ps.weaponTime <= 0)
 				{ //not busy, set it now
 					ent->client->ps.fd.saberAnimLevel = selectLevel;
 				}
@@ -4003,13 +4003,13 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent)
 				}
 			}
 		}
-		else if ( ent->client->ps.saberHolstered == 0 )
+		else if (ent->client->ps.saberHolstered == 0)
 		{//both blades on
-			if ( (ent->client->saber[0].saberFlags2&SFL2_NO_MANUAL_DEACTIVATE) )
+			if ((ent->client->saber[0].saberFlags2 & SFL2_NO_MANUAL_DEACTIVATE))
 			{//can't turn it off manually
 			}
-			else if ( ent->client->saber[0].bladeStyle2Start > 0
-				&& (ent->client->saber[0].saberFlags2&SFL2_NO_MANUAL_DEACTIVATE2) )
+			else if (ent->client->saber[0].bladeStyle2Start > 0
+				&& (ent->client->saber[0].saberFlags2 & SFL2_NO_MANUAL_DEACTIVATE2))
 			{//can't turn it off manually
 			}
 			else
@@ -4018,9 +4018,9 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent)
 				G_Sound(ent, CHAN_AUTO, ent->client->saber[0].soundOff);
 				ent->client->ps.saberHolstered = 1;
 				//g_active should take care of this, but...
-				if ( ent->client->saber[0].singleBladeStyle != SS_NONE )
+				if (ent->client->saber[0].singleBladeStyle != SS_NONE)
 				{
-					if ( ent->client->ps.weaponTime <= 0 )
+					if (ent->client->ps.weaponTime <= 0)
 					{ //not busy, set it now
 						ent->client->ps.fd.saberAnimLevel = ent->client->saber[0].singleBladeStyle;
 					}
@@ -4033,7 +4033,7 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent)
 		}
 		if (d_saberStanceDebug.integer)
 		{
-			trap->SendServerCommand( ent-g_entities, va("print \"SABERSTANCEDEBUG: Attempted to toggle staff blade.\n\"") );
+			trap->SendServerCommand(ent - g_entities, va("print \"SABERSTANCEDEBUG: Attempted to toggle staff blade.\n\""));
 		}
 		return;
 	}
@@ -4051,7 +4051,7 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent)
 		ent->client->siegeClass != -1 &&
 		bgSiegeClasses[ent->client->siegeClass].saberStance)
 	{ //we have a flag of useable stances so cycle through it instead
-		int i = selectLevel+1;
+		int i = selectLevel + 1;
 
 		usingSiegeStyle = qtrue;
 
@@ -4072,41 +4072,59 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent)
 
 		if (d_saberStanceDebug.integer)
 		{
-			trap->SendServerCommand( ent-g_entities, va("print \"SABERSTANCEDEBUG: Attempted to cycle given class stance.\n\"") );
+			trap->SendServerCommand(ent - g_entities, va("print \"SABERSTANCEDEBUG: Attempted to cycle given class stance.\n\""));
 		}
 	}
 	else
 	{
-		selectLevel++;
-		if ( selectLevel > ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] )
-		{
-			selectLevel = FORCE_LEVEL_1;
-		}
+		/*selectLevel++; // Niksata Edit all saber styles cycle
+		if (selectLevel >= SS_NUM_SABER_STYLES) {
+			selectLevel = SS_FAST;
+		} // Niksata Edit all saber styles cycle
+
 		if (d_saberStanceDebug.integer)
 		{
-			trap->SendServerCommand( ent-g_entities, va("print \"SABERSTANCEDEBUG: Attempted to cycle stance normally.\n\"") );
+			trap->SendServerCommand(ent - g_entities, va("print \"SABERSTANCEDEBUG: Attempted to cycle stance normally.\n\""));
+		} */
+
+		selectLevel++; // Increment saber style
+
+		if (selectLevel >= SS_NUM_SABER_STYLES) {
+			selectLevel = SS_FAST;
 		}
+
+		// If only one saber is equipped (not dual sabers)
+		if (!(ent->client->saber[0].model[0] && ent->client->saber[1].model[0])) {
+			// Skip dual and staff styles
+			while (selectLevel == SS_DUAL || selectLevel == SS_STAFF) {
+				selectLevel++;
+				if (selectLevel >= SS_NUM_SABER_STYLES) {
+					selectLevel = SS_FAST;
+				}
+			}
+		}
+
 	}
-/*
-#ifndef FINAL_BUILD
-	switch ( selectLevel )
-	{
-	case FORCE_LEVEL_1:
-		trap->SendServerCommand( ent-g_entities, va("print \"Lightsaber Combat Style: %sfast\n\"", S_COLOR_BLUE) );
-		break;
-	case FORCE_LEVEL_2:
-		trap->SendServerCommand( ent-g_entities, va("print \"Lightsaber Combat Style: %smedium\n\"", S_COLOR_YELLOW) );
-		break;
-	case FORCE_LEVEL_3:
-		trap->SendServerCommand( ent-g_entities, va("print \"Lightsaber Combat Style: %sstrong\n\"", S_COLOR_RED) );
-		break;
-	}
-#endif
-*/
-	if ( !usingSiegeStyle )
+	/*
+	#ifndef FINAL_BUILD
+		switch ( selectLevel )
+		{
+		case FORCE_LEVEL_1:
+			trap->SendServerCommand( ent-g_entities, va("print \"Lightsaber Combat Style: %sfast\n\"", S_COLOR_BLUE) );
+			break;
+		case FORCE_LEVEL_2:
+			trap->SendServerCommand( ent-g_entities, va("print \"Lightsaber Combat Style: %smedium\n\"", S_COLOR_YELLOW) );
+			break;
+		case FORCE_LEVEL_3:
+			trap->SendServerCommand( ent-g_entities, va("print \"Lightsaber Combat Style: %sstrong\n\"", S_COLOR_RED) );
+			break;
+		}
+	#endif
+	*/
+	if (!usingSiegeStyle)
 	{
 		//make sure it's valid, change it if not
-		WP_UseFirstValidSaberStyle( &ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, &selectLevel );
+		WP_UseFirstValidSaberStyle(&ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, &selectLevel);
 	}
 
 	if (ent->client->ps.weaponTime <= 0)
@@ -4117,7 +4135,7 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent)
 	{ //can't set it now or we might cause unexpected chaining, so queue it
 		ent->client->ps.fd.saberAnimLevelBase = ent->client->saberCycleQueue = selectLevel;
 	}
-}
+} // Niksata Edit
 
 #if 0
 qboolean G_OtherPlayersDueling(void)

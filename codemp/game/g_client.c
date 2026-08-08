@@ -28,6 +28,15 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 // g_client.c -- client functions that don't happen every frame
 
+typedef struct { // Niksata Edit
+	char modelName[MAX_QPATH];
+	float scale;
+} modelScaleEntry_t;
+
+static modelScaleEntry_t scaleEntries[256];
+static int numScaleEntries = 0;
+static qboolean scaleConfigLoaded = qfalse; // Niksata Edit
+
 static vec3_t	playerMins = {-15, -15, DEFAULT_MINS_2};
 static vec3_t	playerMaxs = {15, 15, DEFAULT_MAXS_2};
 
@@ -2306,47 +2315,146 @@ void DetectTribesClass(gentity_t *ent, char *model) {
 	}
 }
 
-qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as an INT can just be max_qpath instead of max_info_string and help performance  a bit..?
-	gentity_t	*ent = g_entities + clientNum;
-	gclient_t	*client = ent->client;
-	int			teamLeader, team=TEAM_FREE, health=100, maxHealth=100;
-	char		*s=NULL,						*value=NULL,
-				userinfo[MAX_INFO_STRING]={0},	buf[MAX_INFO_STRING]={0},		oldClientinfo[MAX_INFO_STRING]={0},
-				model[MAX_QPATH]={0},			forcePowers[MAX_QPATH]={0},		oldname[MAX_NETNAME]={0},
-				className[MAX_QPATH]={0},		color1[MAX_QPATH]={0},	color2[MAX_QPATH]={0}, cp_sbRGB1[MAX_QPATH]={0}, cp_sbRGB2[MAX_QPATH]={0}, cp_cosmetics[MAX_QPATH] = { 0 };
+// Add this function to load the config file // Niksata Edit
+void LoadModelScaleConfig(void) {
+	fileHandle_t fileHandle;
+	char buffer[4096];
+	char* bufferPtr;
+	int len;
+
+	if (scaleConfigLoaded) return; // Already loaded
+
+	char filename[MAX_QPATH];
+	// Correct path for TaystJK structure
+	Com_sprintf(filename, sizeof(filename), "modelscale.cfg");
+
+	len = trap->FS_Open(filename, &fileHandle, FS_READ);
+	if (len > 0 && len < sizeof(buffer)) {
+		trap->FS_Read(buffer, len, fileHandle);
+		buffer[len] = '\0';
+		trap->FS_Close(fileHandle);
+
+		Com_Printf("ModelScale: Loading %s (len=%d)\n", filename, len);
+
+		bufferPtr = buffer;
+
+		// Parse line by line
+		char lineBuffer[256];
+		while (*bufferPtr && numScaleEntries < 256) {
+			// Find end of current line
+			char* lineEnd = strchr(bufferPtr, '\n');
+			if (!lineEnd) lineEnd = strchr(bufferPtr, '\r');
+
+			if (lineEnd) {
+				int lineLen = lineEnd - bufferPtr;
+				if (lineLen > 0 && lineLen < sizeof(lineBuffer) - 1) {
+					// Copy line and null terminate
+					strncpy(lineBuffer, bufferPtr, lineLen);
+					lineBuffer[lineLen] = '\0';
+
+					// Skip comments and empty lines
+					if (lineBuffer[0] != '/' && lineBuffer[0] != '#' && lineBuffer[0] != '\0' && lineBuffer[0] != ' ') {
+						char modelNameToken[MAX_QPATH];
+						float scale;
+
+						if (sscanf(lineBuffer, "%s %f", modelNameToken, &scale) == 2) {
+							Q_strncpyz(scaleEntries[numScaleEntries].modelName, modelNameToken, MAX_QPATH);
+							scaleEntries[numScaleEntries].scale = scale;
+							Com_Printf("ModelScale: Loaded %s with scale %.2f\n", modelNameToken, scale);
+							numScaleEntries++;
+						}
+					}
+				}
+				bufferPtr = lineEnd + 1;
+				// Skip \r if present
+				if (*bufferPtr == '\r') bufferPtr++;
+			}
+			else {
+				break; // End of buffer
+			}
+		}
+
+		scaleConfigLoaded = qtrue;
+		Com_Printf("ModelScale: Loaded %d model scale entries from %s\n", numScaleEntries, filename);
+	}
+	else {
+		Com_Printf("ModelScale: Could not load %s (len=%d), using defaults\n", filename, len);
+		Com_Printf("ModelScale: Create GameData/taystjk/modelscale.cfg with your model scales\n");
+		scaleConfigLoaded = qtrue; // Don't try again
+	}
+}
+
+// Add this function to get scale from config or fallback
+float GetModelScale(const char* modelName) {
+	int i;
+
+	// Load config if not already loaded
+	if (!scaleConfigLoaded) {
+		LoadModelScaleConfig();
+	}
+
+	// Search for model in config
+	for (i = 0; i < numScaleEntries; i++) {
+		if (Q_stricmp(scaleEntries[i].modelName, modelName) == 0) {
+			return scaleEntries[i].scale;
+		}
+	}
+
+	return 1.0f; // Default scale
+}
+
+// REPLACE your current model scaling section with this:
+/*
+	// MODEL SCALING INTEGRATION - Config file support
+	float scale = GetModelScale(model);
+
+	// Set the scale values
+	// client->ps.modelScale = scale; // This field doesn't exist - removed
+	client->ps.iModelScale = (int)(scale * 100.0f);
+*/ // Niksata Edit
+
+qboolean ClientUserinfoChanged(int clientNum) { //I think anything treated as an INT can just be max_qpath instead of max_info_string and help performance  a bit..? // Niksata Edit
+	gentity_t* ent = g_entities + clientNum;
+	gclient_t* client = ent->client;
+	int			teamLeader, team = TEAM_FREE, health = 100, maxHealth = 100;
+	char* s = NULL, * value = NULL,
+		userinfo[MAX_INFO_STRING] = { 0 }, buf[MAX_INFO_STRING] = { 0 }, oldClientinfo[MAX_INFO_STRING] = { 0 },
+		model[MAX_QPATH] = { 0 }, forcePowers[MAX_QPATH] = { 0 }, oldname[MAX_NETNAME] = { 0 },
+		className[MAX_QPATH] = { 0 }, color1[MAX_QPATH] = { 0 }, color2[MAX_QPATH] = { 0 }, cp_sbRGB1[MAX_QPATH] = { 0 }, cp_sbRGB2[MAX_QPATH] = { 0 }, cp_cosmetics[MAX_QPATH] = { 0 };
 	qboolean	modelChanged = qfalse;
 	gender_t	gender = GENDER_MALE;
 
-	trap->GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	trap->GetUserinfo(clientNum, userinfo, sizeof(userinfo));
 
 	// check for malformed or illegal info strings
-	s = G_ValidateUserinfo( userinfo );
-	if ( s && *s ) {
-		G_SecurityLogPrintf( "Client %d (%s) failed userinfo validation: %s [IP: %s]\n", clientNum, ent->client->pers.netname, s, client->sess.IP );
-		trap->DropClient( clientNum, va( "Failed userinfo validation: %s", s ) );
-		G_LogPrintf( "Userinfo: %s\n", userinfo );
+	s = G_ValidateUserinfo(userinfo);
+	if (s && *s) {
+		G_SecurityLogPrintf("Client %d (%s) failed userinfo validation: %s [IP: %s]\n", clientNum, ent->client->pers.netname, s, client->sess.IP);
+		trap->DropClient(clientNum, va("Failed userinfo validation: %s", s));
+		G_LogPrintf("Userinfo: %s\n", userinfo);
 		return qfalse;
 	}
 
 	// check for local client
-	s = Info_ValueForKey( userinfo, "ip" );
-	if ( !strcmp( s, "localhost" ) && !(ent->r.svFlags & SVF_BOT) )
+	s = Info_ValueForKey(userinfo, "ip");
+	if (!strcmp(s, "localhost") && !(ent->r.svFlags & SVF_BOT))
 		client->pers.localClient = qtrue;
 
 	// check the item prediction
-	s = Info_ValueForKey( userinfo, "cg_predictItems" );
-	if ( !atoi( s ) )	client->pers.predictItemPickup = qfalse;
+	s = Info_ValueForKey(userinfo, "cg_predictItems");
+	if (!atoi(s))	client->pers.predictItemPickup = qfalse;
 	else				client->pers.predictItemPickup = qtrue;
 
-//JAPRO - Serverside - Get Clients Mod version, if any - Start
-	s = Info_ValueForKey( userinfo, "cjp_client" );
-	if ( !strcmp( s, "1.4JAPRO" ) ) {
+	//JAPRO - Serverside - Get Clients Mod version, if any - Start
+	s = Info_ValueForKey(userinfo, "cjp_client");
+	if (!strcmp(s, "1.4JAPRO")) {
 		client->pers.isJAPRO = qtrue;
-	} else {
+	}
+	else {
 		client->pers.isJAPRO = qfalse;
 	}
 
-	s = Info_ValueForKey( userinfo, "cp_pluginDisable" );
+	s = Info_ValueForKey(userinfo, "cp_pluginDisable");
 	if (atoi(s) & JAPRO_PLUGIN_JAWARUN)
 		client->pers.JAWARUN = qtrue;
 	else
@@ -2397,27 +2505,27 @@ qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as 
 	else
 		client->pers.noDuelTele = qfalse;
 
-	s = Info_ValueForKey( userinfo, "rate" );
+	s = Info_ValueForKey(userinfo, "rate");
 	client->pers.rate = atoi(s);
 	if (client->pers.rate > 90000)
 		client->pers.rate = 90000;
 	else if (client->pers.rate < 0)
 		client->pers.rate = 0;
 
-	s = Info_ValueForKey( userinfo, "snaps" );
+	s = Info_ValueForKey(userinfo, "snaps");
 	client->pers.snaps = atoi(s);
 	if (client->pers.snaps > 1000)
 		client->pers.snaps = 1000;
 	else if (client->pers.snaps < 0)
 		client->pers.snaps = 0;
 
-	s = Info_ValueForKey( userinfo, "cg_displayNetSettings" );
+	s = Info_ValueForKey(userinfo, "cg_displayNetSettings");
 	if (Q_stricmp(s, "")) { //if s is set
 		char tmp[MAX_INFO_VALUE];
-		char * pch;
+		char* pch;
 		int i = 0;
 		Q_strncpyz(tmp, s, sizeof(tmp));
-		pch = strtok (tmp, " ");
+		pch = strtok(tmp, " ");
 		while (pch != NULL) {
 			if (i == 0)
 				client->pers.maxPackets = atoi(pch);
@@ -2425,9 +2533,9 @@ qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as 
 				client->pers.timenudge = atoi(pch);
 			else if (i == 2)
 				client->pers.maxFPS = atoi(pch); //This should have been max msec i guess. w/e
-			else 
+			else
 				break;
-			pch = strtok (NULL, " ");
+			pch = strtok(NULL, " ");
 			i++;
 		}
 	}
@@ -2435,17 +2543,17 @@ qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as 
 		client->pers.timenudge = Q3_INFINITE;//Not set..
 	}
 
-	s = Info_ValueForKey( userinfo, "cg_displayCameraPosition" );
+	s = Info_ValueForKey(userinfo, "cg_displayCameraPosition");
 	if (Q_stricmp(s, "")) { //if s is set
 		char tmp[MAX_INFO_VALUE];
-		char strTemp[64] = {0};
+		char strTemp[64] = { 0 };
 		int encodedRange;
 		int encodedOffset;
 
-		char * pch;
+		char* pch;
 		int i = 0;
 		Q_strncpyz(tmp, s, sizeof(tmp));
-		pch = strtok (tmp, " ");
+		pch = strtok(tmp, " ");
 		while (pch != NULL) {
 			if (i == 0)
 				client->pers.thirdPerson = (qboolean)atoi(pch);
@@ -2453,9 +2561,9 @@ qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as 
 				client->pers.thirdPersonRange = atoi(pch);
 			else if (i == 2)
 				client->pers.thirdPersonVertOffset = atoi(pch);
-			else 
+			else
 				break;
-			pch = strtok (NULL, " ");
+			pch = strtok(NULL, " ");
 			i++;
 		}
 
@@ -2469,7 +2577,7 @@ qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as 
 		if (!client->pers.thirdPerson)
 			encodedRange = -encodedRange;
 
-		Com_sprintf( strTemp, 128, "%i%02i", encodedRange, encodedOffset );
+		Com_sprintf(strTemp, 128, "%i%02i", encodedRange, encodedOffset);
 		client->pers.cameraSettings = atoi(strTemp);
 		client->ps.persistant[PERS_CAMERA_SETTINGS] = client->pers.cameraSettings; //This gets reset on clientbegin ? damn
 	}
@@ -2487,33 +2595,33 @@ qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as 
 	else if (client->pers.maxFPS < 0)
 		client->pers.maxFPS = 0;
 
-//JAPRO - Serverside - Get Clients Mod version, if any - End
+	//JAPRO - Serverside - Get Clients Mod version, if any - End
 
-	// set name
-	Q_strncpyz( oldname, client->pers.netname, sizeof( oldname ) );
-	s = Info_ValueForKey( userinfo, "name" );
-	ClientCleanName( s, client->pers.netname, sizeof( client->pers.netname ) );
-	Q_strncpyz( client->pers.netname_nocolor, client->pers.netname, sizeof( client->pers.netname_nocolor ) );
-	Q_StripColor( client->pers.netname_nocolor );
+		// set name
+	Q_strncpyz(oldname, client->pers.netname, sizeof(oldname));
+	s = Info_ValueForKey(userinfo, "name");
+	ClientCleanName(s, client->pers.netname, sizeof(client->pers.netname));
+	Q_strncpyz(client->pers.netname_nocolor, client->pers.netname, sizeof(client->pers.netname_nocolor));
+	Q_StripColor(client->pers.netname_nocolor);
 
 	if (!g_allowSamePlayerNames.integer)//JAPRO - Serverside - Same player name fix
 		CheckDuplicateName(clientNum);
 
-	if ( client->sess.sessionTeam == TEAM_SPECTATOR && client->sess.spectatorState == SPECTATOR_SCOREBOARD )
+	if (client->sess.sessionTeam == TEAM_SPECTATOR && client->sess.spectatorState == SPECTATOR_SCOREBOARD)
 	{
-		Q_strncpyz( client->pers.netname, "scoreboard", sizeof( client->pers.netname ) );
-		Q_strncpyz( client->pers.netname_nocolor, "scoreboard", sizeof( client->pers.netname_nocolor ) );
+		Q_strncpyz(client->pers.netname, "scoreboard", sizeof(client->pers.netname));
+		Q_strncpyz(client->pers.netname_nocolor, "scoreboard", sizeof(client->pers.netname_nocolor));
 	}
 
-	if ( client->pers.connected == CON_CONNECTED && strcmp( oldname, client->pers.netname ) != 0 ) {
-		if ( client->pers.netnameTime > level.time ) {
-			trap->SendServerCommand( clientNum, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "NONAMECHANGE" ) ) );
+	if (client->pers.connected == CON_CONNECTED && strcmp(oldname, client->pers.netname) != 0) {
+		if (client->pers.netnameTime > level.time) {
+			trap->SendServerCommand(clientNum, va("print \"%s\n\"", G_GetStringEdString("MP_SVGAME", "NONAMECHANGE")));
 
-				Info_SetValueForKey( userinfo, "name", oldname );
-				trap->SetUserinfo( clientNum, userinfo );			
-				Q_strncpyz( client->pers.netname, oldname, sizeof( client->pers.netname ) );
-				Q_strncpyz( client->pers.netname_nocolor, oldname, sizeof( client->pers.netname_nocolor ) );
-				Q_StripColor( client->pers.netname_nocolor );
+			Info_SetValueForKey(userinfo, "name", oldname);
+			trap->SetUserinfo(clientNum, userinfo);
+			Q_strncpyz(client->pers.netname, oldname, sizeof(client->pers.netname));
+			Q_strncpyz(client->pers.netname_nocolor, oldname, sizeof(client->pers.netname_nocolor));
+			Q_StripColor(client->pers.netname_nocolor);
 		}
 		else
 		{
@@ -2531,12 +2639,19 @@ qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as 
 	}
 
 	// set model
-	Q_strncpyz( model, Info_ValueForKey( userinfo, "model" ), sizeof( model ) );
+	Q_strncpyz(model, Info_ValueForKey(userinfo, "model"), sizeof(model));
 
-	if ( d_perPlayerGhoul2.integer&& Q_stricmp( model, client->modelname ) ) {
-		Q_strncpyz( client->modelname, model, sizeof( client->modelname ) );
+	if (d_perPlayerGhoul2.integer && Q_stricmp(model, client->modelname)) {
+		Q_strncpyz(client->modelname, model, sizeof(client->modelname));
 		modelChanged = qtrue;
 	}
+
+	// MODEL SCALING INTEGRATION - Config file support // Niksata Edit
+	float scale = GetModelScale(model);
+
+	// Set the scale values
+	// client->ps.modelScale = scale; // This field doesn't exist - removed
+	client->ps.iModelScale = (int)(scale * 100.0f); // Niksata Edit
 
 	//WT_TRIBES
 	if (g_tribesMode.integer && (!client->sess.raceMode || (level.gametype >= GT_TEAM && client->sess.sessionTeam > TEAM_FREE))) {
@@ -2546,28 +2661,28 @@ qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as 
 		client->pers.tribesClass = 0;
 	}
 
-	client->ps.customRGBA[0] = (value=Info_ValueForKey( userinfo, "char_color_red" ))	? Com_Clampi( 0, 255, atoi( value ) ) : 255;
-	client->ps.customRGBA[1] = (value=Info_ValueForKey( userinfo, "char_color_green" ))	? Com_Clampi( 0, 255, atoi( value ) ) : 255;
-	client->ps.customRGBA[2] = (value=Info_ValueForKey( userinfo, "char_color_blue" ))	? Com_Clampi( 0, 255, atoi( value ) ) : 255;
+	client->ps.customRGBA[0] = (value = Info_ValueForKey(userinfo, "char_color_red")) ? Com_Clampi(0, 255, atoi(value)) : 255;
+	client->ps.customRGBA[1] = (value = Info_ValueForKey(userinfo, "char_color_green")) ? Com_Clampi(0, 255, atoi(value)) : 255;
+	client->ps.customRGBA[2] = (value = Info_ValueForKey(userinfo, "char_color_blue")) ? Com_Clampi(0, 255, atoi(value)) : 255;
 
 	//Prevent skins being too dark
-	if ( g_charRestrictRGB.integer && ((client->ps.customRGBA[0]+client->ps.customRGBA[1]+client->ps.customRGBA[2]) < 100) )
+	if (g_charRestrictRGB.integer && ((client->ps.customRGBA[0] + client->ps.customRGBA[1] + client->ps.customRGBA[2]) < 100))
 		client->ps.customRGBA[0] = client->ps.customRGBA[1] = client->ps.customRGBA[2] = 255;
 
-	client->ps.customRGBA[3]=255;
+	client->ps.customRGBA[3] = 255;
 
-	Q_strncpyz( forcePowers, Info_ValueForKey( userinfo, "forcepowers" ), sizeof( forcePowers ) );
+	Q_strncpyz(forcePowers, Info_ValueForKey(userinfo, "forcepowers"), sizeof(forcePowers));
 
 	// update our customRGBA for team colors.
-	if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.integer ) {
-		char skin[MAX_QPATH] = {0};
-		vec3_t colorOverride = {0.0f};
+	if (level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.integer) {
+		char skin[MAX_QPATH] = { 0 };
+		vec3_t colorOverride = { 0.0f };
 
-		VectorClear( colorOverride );
+		VectorClear(colorOverride);
 
-		BG_ValidateSkinForTeam( model, skin, client->sess.sessionTeam, colorOverride );
-		if ( colorOverride[0] != 0.0f || colorOverride[1] != 0.0f || colorOverride[2] != 0.0f )
-			VectorScaleM( colorOverride, 255.0f, client->ps.customRGBA );
+		BG_ValidateSkinForTeam(model, skin, client->sess.sessionTeam, colorOverride);
+		if (colorOverride[0] != 0.0f || colorOverride[1] != 0.0f || colorOverride[2] != 0.0f)
+			VectorScaleM(colorOverride, 255.0f, client->ps.customRGBA);
 	}
 
 	Q_strncpyz(cp_cosmetics, Info_ValueForKey(userinfo, "cp_cosmetics"), sizeof(cp_cosmetics));
@@ -2575,14 +2690,14 @@ qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as 
 		G_ValidateCosmetics(client, cp_cosmetics, sizeof(cp_cosmetics)); //Model cosmetics
 
 	// bots set their team a few frames later
-	if ( level.gametype >= GT_TEAM && g_entities[clientNum].r.svFlags & SVF_BOT ) {
-		s = Info_ValueForKey( userinfo, "team" );
-		if ( !Q_stricmp( s, "red" ) || !Q_stricmp( s, "r" ) )
+	if (level.gametype >= GT_TEAM && g_entities[clientNum].r.svFlags & SVF_BOT) {
+		s = Info_ValueForKey(userinfo, "team");
+		if (!Q_stricmp(s, "red") || !Q_stricmp(s, "r"))
 			team = TEAM_RED;
-		else if ( !Q_stricmp( s, "blue" ) || !Q_stricmp( s, "b" ) )
+		else if (!Q_stricmp(s, "blue") || !Q_stricmp(s, "b"))
 			team = TEAM_BLUE;
 		else
-			team = PickTeam( clientNum ); // pick the team with the least number of players
+			team = PickTeam(clientNum); // pick the team with the least number of players
 	}
 	else
 		team = client->sess.sessionTeam;
@@ -2591,60 +2706,60 @@ qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as 
 	team = client->sess.sessionTeam;
 
 	//Set the siege class
-	if ( level.gametype == GT_SIEGE ) {
-		Q_strncpyz( className, client->sess.siegeClass, sizeof( className ) );
+	if (level.gametype == GT_SIEGE) {
+		Q_strncpyz(className, client->sess.siegeClass, sizeof(className));
 
 		//Now that the team is legal for sure, we'll go ahead and get an index for it.
-		client->siegeClass = BG_SiegeFindClassIndexByName( className );
-		if ( client->siegeClass == -1 ) {
+		client->siegeClass = BG_SiegeFindClassIndexByName(className);
+		if (client->siegeClass == -1) {
 			// ok, get the first valid class for the team you're on then, I guess.
-			BG_SiegeCheckClassLegality( team, className );
-			Q_strncpyz( client->sess.siegeClass, className, sizeof( client->sess.siegeClass ) );
-			client->siegeClass = BG_SiegeFindClassIndexByName( className );
+			BG_SiegeCheckClassLegality(team, className);
+			Q_strncpyz(client->sess.siegeClass, className, sizeof(client->sess.siegeClass));
+			client->siegeClass = BG_SiegeFindClassIndexByName(className);
 		}
 		else {
 			// otherwise, make sure the class we are using is legal.
-			G_ValidateSiegeClassForTeam( ent, team );
-			Q_strncpyz( className, client->sess.siegeClass, sizeof( className ) );
+			G_ValidateSiegeClassForTeam(ent, team);
+			Q_strncpyz(className, client->sess.siegeClass, sizeof(className));
 		}
 
-		if ( client->siegeClass != -1 ) {
+		if (client->siegeClass != -1) {
 			// Set the sabers if the class dictates
-			siegeClass_t *scl = &bgSiegeClasses[client->siegeClass];
+			siegeClass_t* scl = &bgSiegeClasses[client->siegeClass];
 
-			G_SetSaber( ent, 0, scl->saber1[0] ? scl->saber1 : DEFAULT_SABER, qtrue );
-			G_SetSaber( ent, 1, scl->saber2[0] ? scl->saber2 : "none", qtrue );
+			G_SetSaber(ent, 0, scl->saber1[0] ? scl->saber1 : DEFAULT_SABER, qtrue);
+			G_SetSaber(ent, 1, scl->saber2[0] ? scl->saber2 : "none", qtrue);
 
 			//make sure the saber models are updated
-			G_SaberModelSetup( ent );
+			G_SaberModelSetup(ent);
 
-			if ( scl->forcedModel[0] ) {
+			if (scl->forcedModel[0]) {
 				// be sure to override the model we actually use
-				Q_strncpyz( model, scl->forcedModel, sizeof( model ) );
-				if ( d_perPlayerGhoul2.integer && Q_stricmp( model, client->modelname ) ) {
-					Q_strncpyz( client->modelname, model, sizeof( client->modelname ) );
+				Q_strncpyz(model, scl->forcedModel, sizeof(model));
+				if (d_perPlayerGhoul2.integer && Q_stricmp(model, client->modelname)) {
+					Q_strncpyz(client->modelname, model, sizeof(client->modelname));
 					modelChanged = qtrue;
 				}
 			}
 
-			if ( G_PlayerHasCustomSkeleton( ent ) )
+			if (G_PlayerHasCustomSkeleton(ent))
 			{//force them to use their class model on the server, if the class dictates
-				if ( Q_stricmp( model, client->modelname ) || ent->localAnimIndex == 0 )
+				if (Q_stricmp(model, client->modelname) || ent->localAnimIndex == 0)
 				{
-					Q_strncpyz( client->modelname, model, sizeof( client->modelname ) );
+					Q_strncpyz(client->modelname, model, sizeof(client->modelname));
 					modelChanged = qtrue;
 				}
 			}
 		}
 	}
 	else
-		Q_strncpyz( className, "none", sizeof( className ) );
+		Q_strncpyz(className, "none", sizeof(className));
 
 	// only set the saber name on the first connect.
 	//	it will be read from userinfo on ClientSpawn and stored in client->pers.saber1/2
-	if ( !VALIDSTRING( client->pers.saber1 ) || !VALIDSTRING( client->pers.saber2 ) ) {
-		G_SetSaber( ent, 0, Info_ValueForKey( userinfo, "saber1" ), qfalse );
-		G_SetSaber( ent, 1, Info_ValueForKey( userinfo, "saber2" ), qfalse );
+	if (!VALIDSTRING(client->pers.saber1) || !VALIDSTRING(client->pers.saber2)) {
+		G_SetSaber(ent, 0, Info_ValueForKey(userinfo, "saber1"), qfalse);
+		G_SetSaber(ent, 1, Info_ValueForKey(userinfo, "saber2"), qfalse);
 	}
 
 	//Don't even do this in tribes mode?  We only do this on client spawn
@@ -2652,7 +2767,7 @@ qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as 
 		// set max health
 		if (level.gametype == GT_SIEGE && client->siegeClass != -1)
 		{
-			siegeClass_t *scl = &bgSiegeClasses[client->siegeClass];
+			siegeClass_t* scl = &bgSiegeClasses[client->siegeClass];
 			maxHealth = 100;
 
 			if (scl->maxhealth)
@@ -2671,11 +2786,11 @@ qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as 
 		client->ps.stats[STAT_MAX_HEALTH] = client->pers.maxHealth;
 	}
 
-	if ( level.gametype >= GT_TEAM )
+	if (level.gametype >= GT_TEAM)
 		client->pers.teamInfo = qtrue;
 	else {
-		s = Info_ValueForKey( userinfo, "teamoverlay" );
-		if ( !*s || atoi( s ) != 0 )
+		s = Info_ValueForKey(userinfo, "teamoverlay");
+		if (!*s || atoi(s) != 0)
 			client->pers.teamInfo = qtrue;
 		else
 			client->pers.teamInfo = qfalse;
@@ -2687,76 +2802,76 @@ qboolean ClientUserinfoChanged( int clientNum ) { //I think anything treated as 
 	teamLeader = client->sess.teamLeader;
 
 	// colors
-	Q_strncpyz( color1, Info_ValueForKey( userinfo, "color1" ), sizeof( color1 ) );
-	Q_strncpyz( color2, Info_ValueForKey( userinfo, "color2" ), sizeof( color2 ) );
-	Q_strncpyz( cp_sbRGB1, Info_ValueForKey( userinfo, "cp_sbRGB1" ), sizeof(cp_sbRGB1) );//rgbsabers
-	Q_strncpyz( cp_sbRGB2, Info_ValueForKey( userinfo, "cp_sbRGB2" ), sizeof(cp_sbRGB2) );//rgbsabers
+	Q_strncpyz(color1, Info_ValueForKey(userinfo, "color1"), sizeof(color1));
+	Q_strncpyz(color2, Info_ValueForKey(userinfo, "color2"), sizeof(color2));
+	Q_strncpyz(cp_sbRGB1, Info_ValueForKey(userinfo, "cp_sbRGB1"), sizeof(cp_sbRGB1));//rgbsabers
+	Q_strncpyz(cp_sbRGB2, Info_ValueForKey(userinfo, "cp_sbRGB2"), sizeof(cp_sbRGB2));//rgbsabers
 
 	// gender hints
-	s = Info_ValueForKey( userinfo, "sex" );
-	if ( !Q_stricmp( s, "female" ) )
+	s = Info_ValueForKey(userinfo, "sex");
+	if (!Q_stricmp(s, "female"))
 		gender = GENDER_FEMALE;
 	else
 		gender = GENDER_MALE;
 
-	s = Info_ValueForKey( userinfo, "snaps" );
-	if ( atoi( s ) < sv_fps.integer )
-		trap->SendServerCommand( clientNum, va( "print \"" S_COLOR_YELLOW "Recommend setting /snaps %d or higher to match this server's sv_fps\n\"", sv_fps.integer ) );
+	s = Info_ValueForKey(userinfo, "snaps");
+	if (atoi(s) < sv_fps.integer)
+		trap->SendServerCommand(clientNum, va("print \"" S_COLOR_YELLOW "Recommend setting /snaps %d or higher to match this server's sv_fps\n\"", sv_fps.integer));
 
 	// send over a subset of the userinfo keys so other clients can
 	// print scoreboards, display models, and play custom sounds
 	buf[0] = '\0';
-	Q_strcat( buf, sizeof( buf ), va( "n\\%s\\", client->pers.netname ) );
-	Q_strcat( buf, sizeof( buf ), va( "t\\%i\\", client->sess.sessionTeam ) );
-	Q_strcat( buf, sizeof( buf ), va( "model\\%s\\", model ) );
-	if ( gender == GENDER_FEMALE )	Q_strcat( buf, sizeof( buf ), va( "ds\\%c\\", 'f' ) );
-	else							Q_strcat( buf, sizeof( buf ), va( "ds\\%c\\", 'm' ) );
-	Q_strcat( buf, sizeof( buf ), va( "st\\%s\\", client->pers.saber1 ) );
-	Q_strcat( buf, sizeof( buf ), va( "st2\\%s\\", client->pers.saber2 ) );
-	Q_strcat( buf, sizeof( buf ), va( "c1\\%s\\", color1 ) );
-	Q_strcat( buf, sizeof( buf ), va( "c2\\%s\\", color2 ) );
-	Q_strcat( buf, sizeof(buf), va( "c3\\%s\\", cp_sbRGB1 ) );//rgbsabers
-	Q_strcat( buf, sizeof(buf), va( "c4\\%s\\", cp_sbRGB2 ) );//rgbsabers
+	Q_strcat(buf, sizeof(buf), va("n\\%s\\", client->pers.netname));
+	Q_strcat(buf, sizeof(buf), va("t\\%i\\", client->sess.sessionTeam));
+	Q_strcat(buf, sizeof(buf), va("model\\%s\\", model));
+	if (gender == GENDER_FEMALE)	Q_strcat(buf, sizeof(buf), va("ds\\%c\\", 'f'));
+	else							Q_strcat(buf, sizeof(buf), va("ds\\%c\\", 'm'));
+	Q_strcat(buf, sizeof(buf), va("st\\%s\\", client->pers.saber1));
+	Q_strcat(buf, sizeof(buf), va("st2\\%s\\", client->pers.saber2));
+	Q_strcat(buf, sizeof(buf), va("c1\\%s\\", color1));
+	Q_strcat(buf, sizeof(buf), va("c2\\%s\\", color2));
+	Q_strcat(buf, sizeof(buf), va("c3\\%s\\", cp_sbRGB1));//rgbsabers
+	Q_strcat(buf, sizeof(buf), va("c4\\%s\\", cp_sbRGB2));//rgbsabers
 	Q_strcat(buf, sizeof(buf), va("c5\\%s\\", cp_cosmetics));//cosmetics
-	Q_strcat( buf, sizeof( buf ), va( "hc\\%i\\", client->pers.maxHealth ) );
-	if ( ent->r.svFlags & SVF_BOT )
-		Q_strcat( buf, sizeof( buf ), va( "skill\\%s\\", Info_ValueForKey( userinfo, "skill" ) ) );
-	if ( level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL ) {
-		Q_strcat( buf, sizeof( buf ), va( "w\\%i\\", client->sess.wins ) );
-		Q_strcat( buf, sizeof( buf ), va( "l\\%i\\", client->sess.losses ) );
+	Q_strcat(buf, sizeof(buf), va("hc\\%i\\", client->pers.maxHealth));
+	if (ent->r.svFlags & SVF_BOT)
+		Q_strcat(buf, sizeof(buf), va("skill\\%s\\", Info_ValueForKey(userinfo, "skill")));
+	if (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL) {
+		Q_strcat(buf, sizeof(buf), va("w\\%i\\", client->sess.wins));
+		Q_strcat(buf, sizeof(buf), va("l\\%i\\", client->sess.losses));
 	}
-	if ( level.gametype == GT_POWERDUEL )
-		Q_strcat( buf, sizeof( buf ), va( "dt\\%i\\", client->sess.duelTeam ) );
-	if ( level.gametype >= GT_TEAM ) {
-	//	Q_strcat( buf, sizeof( buf ), va( "tt\\%d\\", teamTask ) );
-		Q_strcat( buf, sizeof( buf ), va( "tl\\%d\\", teamLeader ) );
+	if (level.gametype == GT_POWERDUEL)
+		Q_strcat(buf, sizeof(buf), va("dt\\%i\\", client->sess.duelTeam));
+	if (level.gametype >= GT_TEAM) {
+		//	Q_strcat( buf, sizeof( buf ), va( "tt\\%d\\", teamTask ) );
+		Q_strcat(buf, sizeof(buf), va("tl\\%d\\", teamLeader));
 	}
-	if ( level.gametype == GT_SIEGE ) {
-		Q_strcat( buf, sizeof( buf ), va( "siegeclass\\%s\\", className ) );
-		Q_strcat( buf, sizeof( buf ), va( "sdt\\%i\\", client->sess.siegeDesiredTeam ) );
+	if (level.gametype == GT_SIEGE) {
+		Q_strcat(buf, sizeof(buf), va("siegeclass\\%s\\", className));
+		Q_strcat(buf, sizeof(buf), va("sdt\\%i\\", client->sess.siegeDesiredTeam));
 	}
 
-	trap->GetConfigstring( CS_PLAYERS+clientNum, oldClientinfo, sizeof( oldClientinfo ) );
-	trap->SetConfigstring( CS_PLAYERS+clientNum, buf );
+	trap->GetConfigstring(CS_PLAYERS + clientNum, oldClientinfo, sizeof(oldClientinfo));
+	trap->SetConfigstring(CS_PLAYERS + clientNum, buf);
 
 	// only going to be true for allowable server-side custom skeleton cases
-	if ( modelChanged ) {
+	if (modelChanged) {
 		// update the server g2 instance if appropriate
-		char *modelname = Info_ValueForKey( userinfo, "model" );
-		SetupGameGhoul2Model( ent, modelname, NULL );
+		char* modelname = Info_ValueForKey(userinfo, "model");
+		SetupGameGhoul2Model(ent, modelname, NULL);
 
-		if ( ent->ghoul2 && ent->client )
+		if (ent->ghoul2 && ent->client)
 			ent->client->renderInfo.lastG2 = NULL; //update the renderinfo bolts next update.
 
 		client->torsoAnimExecute = client->legsAnimExecute = -1;
 		client->torsoLastFlip = client->legsLastFlip = qfalse;
 	}
 
-	if ( g_logClientInfo.integer ) {
-		if ( strcmp( oldClientinfo, buf ) )
-			G_LogPrintf( "ClientUserinfoChanged: %i %s\n", clientNum, buf );
+	if (g_logClientInfo.integer) {
+		if (strcmp(oldClientinfo, buf))
+			G_LogPrintf("ClientUserinfoChanged: %i %s\n", clientNum, buf);
 		else
-			G_LogPrintf( "ClientUserinfoChanged: %i <no change>\n", clientNum );
+			G_LogPrintf("ClientUserinfoChanged: %i <no change>\n", clientNum);
 	}
 
 	return qtrue;
@@ -2770,7 +2885,7 @@ static void QINLINE ClientRemoveIgnore(const int targetID) {
 			level.clients[i].sess.ignore &= ~(1 << targetID);
 		}
 	}
-}
+} // Niksata Edit
 //[JAPRO - Serverside - All - Ignore subfunction - End]
 
 /*
@@ -4681,6 +4796,54 @@ void ClientSpawn(gentity_t *ent) {
 	client->respawnTime = level.time;
 	client->inactivityTime = level.time + g_inactivity.integer * 1000;
 	client->latched_buttons = 0;
+
+	// Apply model scale to bounding boxes // Niksata Edit - FIX FOR /default
+
+	trap->GetUserinfo(ent - g_entities, userinfo, sizeof(userinfo));
+	char* model = Info_ValueForKey(userinfo, "model");
+
+	//Com_Printf("ClientSpawn: raw userinfo model='%s'\n", model); // debug
+
+	// Handle modelname/default format - extract just modelname
+	char cleanModel[MAX_QPATH];
+	char* slashPos = strchr(model, '/');
+	if (slashPos) {
+		// Copy everything before the slash
+		int len = slashPos - model;
+		if (len > 0 && len < MAX_QPATH) {
+			strncpy(cleanModel, model, len);
+			cleanModel[len] = '\0';
+			//Com_Printf("ClientSpawn: extracted clean model='%s' from '%s'\n", cleanModel, model); // debug
+			model = cleanModel;
+		}
+	}
+
+	//Com_Printf("ClientSpawn: final model for scaling='%s'\n", model); //debug
+
+	// Force config reload if needed
+	if (!scaleConfigLoaded) {
+		LoadModelScaleConfig();
+	}
+
+	float scale = GetModelScale(model);
+	//Com_Printf("GetModelScale('%s') returned: %.2f\n", model, scale); //debug
+
+	// Update stored value
+	client->ps.iModelScale = (int)(scale * 100.0f);
+	//Com_Printf("Set iModelScale to: %d\n", client->ps.iModelScale); //debug
+
+	if (scale != 1.0f) {
+		VectorScale(playerMins, scale, ent->r.mins);
+		VectorScale(playerMaxs, scale, ent->r.maxs);
+		/*Com_Printf("Applied scaling: mins=(%.1f,%.1f,%.1f) maxs=(%.1f,%.1f,%.1f)\n",
+			ent->r.mins[0], ent->r.mins[1], ent->r.mins[2],
+			ent->r.maxs[0], ent->r.maxs[1], ent->r.maxs[2]);*/ //debug
+	}
+	else {
+		VectorCopy(playerMins, ent->r.mins);
+		VectorCopy(playerMaxs, ent->r.maxs);
+		//Com_Printf("Used default bounding boxes\n"); //debug
+	} // Niksata Edit
 
 	if (!level.intermissiontime) {
 		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR) {

@@ -204,6 +204,12 @@ XCVAR_DEF( g_yellowDamageScale,			"1",			NULL,				CVAR_ARCHIVE,									qtrue ) 
 XCVAR_DEF( g_redDamageScale,			"1",			NULL,				CVAR_ARCHIVE,									qtrue ) //sad hack
 XCVAR_DEF( g_redDFADamageScale,			"1",			NULL,				CVAR_ARCHIVE,									qtrue )
 XCVAR_DEF( g_saberDmgDelay_Hit,			"0",			NULL,				CVAR_ARCHIVE,									qtrue )
+XCVAR_DEF( g_saberAlwaysBlock,			"0",			NULL,				CVAR_ARCHIVE,									qtrue) // NEW: Dynamic always block control // Niksata Edit
+XCVAR_DEF( japp_saberTweaks,			"0",			NULL,				CVAR_ARCHIVE,									qtrue) // NEW: JAPP saber tweaks // Niksata Edit
+XCVAR_DEF( japp_saberBlockChanceMax,	"0.75",			NULL,				CVAR_NONE,										qtrue) // Niksata Edit
+XCVAR_DEF( japp_saberBlockChanceMin,	"0.0",			NULL,				CVAR_NONE,										qtrue) // Niksata Edit
+XCVAR_DEF( japp_saberBlockChanceScale,	"0.5",			NULL,				CVAR_NONE,										qtrue) // Niksata Edit
+XCVAR_DEF( japp_saberBlockStanceParity, "3.0",			NULL,				CVAR_NONE,										qtrue) // Niksata Edit
 
 //JAPRO FORCE
 XCVAR_DEF( g_tweakForce,				"0",			CVU_TweakForce,		CVAR_ARCHIVE,									qtrue )
@@ -213,6 +219,9 @@ XCVAR_DEF( g_fixGetups,					"0",			NULL,				CVAR_ARCHIVE,									qtrue )
 XCVAR_DEF( g_teamAbsorbScale,			"1",			NULL,				CVAR_ARCHIVE,									qtrue )
 XCVAR_DEF( g_teamHealScale,				"1",			NULL,				CVAR_ARCHIVE,									qtrue )
 XCVAR_DEF( g_teamEnergizeScale,			"1",			NULL,				CVAR_ARCHIVE,									qtrue )
+XCVAR_DEF( g_lightningBlockEnabled,		"0",			NULL,				CVAR_ARCHIVE,									qtrue) // Niksata Edit
+XCVAR_DEF( g_lightningBlockCost,		"5",			NULL,				CVAR_ARCHIVE,									qtrue) // Niksata Edit
+XCVAR_DEF( g_lightningBlockReduction,	"0.7",			NULL,				CVAR_ARCHIVE,									qtrue) // Niksata Edit
 
 //JAPRO GUNS
 XCVAR_DEF( g_tweakWeapons,				"0",			CVU_TweakWeapons,	CVAR_ARCHIVE,									qtrue )

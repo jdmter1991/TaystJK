@@ -59,6 +59,8 @@ qboolean BG_SaberStanceAnim( int anim )
 	case BOTH_SABERSLOW_STANCE://single-saber, strong style
 	case BOTH_SABERSTAFF_STANCE://saber staff style
 	case BOTH_SABERDUAL_STANCE://dual saber style
+	case BOTH_SABERTAVION_STANCE: // Niksata Edit
+	case BOTH_SABERDESANN_STANCE: // Niksata Edit
 		return qtrue;
 		break;
 	}
@@ -159,6 +161,8 @@ qboolean BG_InSaberStandAnim( int anim )
 	case BOTH_SABERSLOW_STANCE:
 	case BOTH_SABERDUAL_STANCE:
 	case BOTH_SABERSTAFF_STANCE:
+	case BOTH_SABERTAVION_STANCE: // Niksata Edit
+	case BOTH_SABERDESANN_STANCE: // Niksata Edit
 		return qtrue;
 	default:
 		return qfalse;
@@ -293,6 +297,7 @@ qboolean BG_SaberInAttack( int move )
 	case LS_DUAL_SPIN_PROTECT:
 	case LS_STAFF_SOULCAL:
 	case LS_A1_SPECIAL:
+	case LS_A1_SPECIAL_YODA: // Niksata Edit
 	case LS_A2_SPECIAL:
 	case LS_A3_SPECIAL:
 	case LS_UPSIDE_DOWN_ATTACK:
@@ -313,6 +318,7 @@ qboolean BG_SaberInKata( int saberMove )
 	switch ( saberMove )
 	{
 	case LS_A1_SPECIAL:
+	case LS_A1_SPECIAL_YODA: // Niksata Edit
 	case LS_A2_SPECIAL:
 	case LS_A3_SPECIAL:
 	case LS_DUAL_SPIN_PROTECT:
@@ -329,6 +335,7 @@ qboolean BG_InKataAnim(int anim)
 	case BOTH_A6_SABERPROTECT:
 	case BOTH_A7_SOULCAL:
 	case BOTH_A1_SPECIAL:
+	case BOTH_A1_SPECIAL_YODA: // Niksata Edit
 	case BOTH_A2_SPECIAL:
 	case BOTH_A3_SPECIAL:
 		return qtrue;
@@ -382,6 +389,7 @@ qboolean BG_SaberInSpecial( int move )
 	case LS_DUAL_SPIN_PROTECT:
 	case LS_STAFF_SOULCAL:
 	case LS_A1_SPECIAL:
+	case LS_A1_SPECIAL_YODA: // Niksata Edit
 	case LS_A2_SPECIAL:
 	case LS_A3_SPECIAL:
 	case LS_UPSIDE_DOWN_ATTACK:
@@ -440,6 +448,7 @@ qboolean BG_InExtraDefenseSaberMove( int move )
 	case LS_DUAL_SPIN_PROTECT:
 	case LS_STAFF_SOULCAL:
 	case LS_A1_SPECIAL:
+	case LS_A1_SPECIAL_YODA: // Niksata Edit
 	case LS_A2_SPECIAL:
 	case LS_A3_SPECIAL:
 	case LS_JUMPATTACK_DUAL:
@@ -647,6 +656,7 @@ qboolean BG_SaberInSpecialAttack( int anim )
 	case BOTH_A6_SABERPROTECT:
 	case BOTH_A7_SOULCAL:
 	case BOTH_A1_SPECIAL:
+	case BOTH_A1_SPECIAL_YODA: // Niksata Edit
 	case BOTH_A2_SPECIAL:
 	case BOTH_A3_SPECIAL:
 	case BOTH_FLIP_ATTACK7:

@@ -1340,6 +1340,7 @@ typedef struct playerState_s {
 	float		userFloat3;
 	vec3_t		userVec1;
 	vec3_t		userVec2;
+	float modelScale; // Niksata Edit
 
 #ifdef _ONEBIT_COMBO
 	int			deltaOneBits;

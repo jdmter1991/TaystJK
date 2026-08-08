@@ -220,6 +220,7 @@ saberMoveData_t	saberMoveData[LS_MOVE_MAX] = {//							NB:randomized
 	{"dualspinprot",BOTH_A6_SABERPROTECT,Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_READY,		500	},	// LS_DUAL_SPIN_PROTECT
 	{"StfSoulCal",	BOTH_A7_SOULCAL,	Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_READY,		500	},	// LS_STAFF_SOULCAL
 	{"specialfast",	BOTH_A1_SPECIAL,	Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_READY,		2000},	// LS_A1_SPECIAL
+	{"specialyoda",	BOTH_A1_SPECIAL_YODA,	Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_READY,		2000},	// LS_A1_SPECIAL_YODA // Niksata Edit
 	{"specialmed",	BOTH_A2_SPECIAL,	Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_READY,		2000},	// LS_A2_SPECIAL
 	{"specialstr",	BOTH_A3_SPECIAL,	Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_READY,		2000},	// LS_A3_SPECIAL
 	{"upsidedwnatk",BOTH_FLIP_ATTACK7,	Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_READY,		200},	// LS_UPSIDE_DOWN_ATTACK
@@ -3602,10 +3603,12 @@ weapChecks:
 			//FIXME: make sure to turn on saber(s)!
 			switch ( pm->ps->fd.saberAnimLevel )
 			{
-			case SS_FAST:
-			case SS_TAVION:
-				PM_SetSaberMove( LS_A1_SPECIAL );
+			case SS_FAST: // Niksata Edit
+				PM_SetSaberMove(LS_A1_SPECIAL);
 				break;
+			case SS_TAVION:
+				PM_SetSaberMove(LS_A1_SPECIAL_YODA);
+				break; // Niksata Edit
 			case SS_MEDIUM:
 				PM_SetSaberMove( LS_A2_SPECIAL );
 				break;
@@ -4218,6 +4221,7 @@ void PM_SetSaberMove(short newMove)
 				|| newMove == LS_DUAL_SPIN_PROTECT
 				|| newMove == LS_STAFF_SOULCAL
 				|| newMove == LS_A1_SPECIAL
+				|| newMove == LS_A1_SPECIAL_YODA // Niksata Edit
 				|| newMove == LS_A2_SPECIAL
 				|| newMove == LS_A3_SPECIAL
 				|| newMove == LS_UPSIDE_DOWN_ATTACK

@@ -1611,16 +1611,89 @@ typedef struct cgMedia_s {
 	qhandle_t	purpleSaberGlowShader;
 	qhandle_t	purpleSaberCoreShader;
 
+	// Saber shaders ROTS/TPM // Niksata Edit
+//-----------------------------
+	qhandle_t	redSaberGlowShaderROTS;
+	qhandle_t	redSaberGlowShaderTPM4k; // Niksata Edit
+	qhandle_t	orangeSaberGlowShaderROTS;
+	qhandle_t	orangeSaberGlowShaderTPM4k; // Niksata Edit
+	qhandle_t	yellowSaberGlowShaderROTS;
+	qhandle_t	yellowSaberGlowShaderTPM4k; // Niksata Edit
+	qhandle_t	greenSaberGlowShaderROTS;
+	qhandle_t	greenSaberGlowShaderTPM4k; // Niksata Edit
+	qhandle_t	blueSaberGlowShaderROTS;
+	qhandle_t	blueSaberGlowShaderTPM4k; // Niksata Edit
+	qhandle_t	purpleSaberGlowShaderROTS;
+	qhandle_t	purpleSaberGlowShaderTPM4k; // Niksata Edit
+
 	//rgb
 	qhandle_t	rgbSaberGlowShader;
+	qhandle_t	rgbSaberGlowShaderROTS; // Niksata Edit
+	qhandle_t	rgbSaberGlowShaderTPM4k; // Niksata Edit
 	qhandle_t	rgbSaberCoreShader;
 
 	//sfx
 	qhandle_t	ShaderSaberTrail;
+	qhandle_t	ShaderSaberTrailblack; // Niksata Edit
+	qhandle_t	ShaderSaberTrailAhsoka; // Niksata Edit
+	qhandle_t	ShaderSaberTrailblackAhsoka; // Niksata Edit
 	qhandle_t	ShaderSaberBlade;
 	qhandle_t	ShaderSaberBladeRGB;
 	qhandle_t	ShaderSaberEnd;
+	qhandle_t	ShaderSaberEndblack; // Niksata Edit
 	qhandle_t	ShaderSaberEndRGB;
+
+	//sfx TPM Theatrical // Niksata Edit
+	qhandle_t	ShaderSaberBladeTPMTheatrical;
+	qhandle_t	ShaderSaberBladeTPM4k;
+	qhandle_t	ShaderSaberBladeRGBTPMTheatrical;
+	qhandle_t	redSaberGlowShaderTPMTheatrical;
+	qhandle_t	orangeSaberGlowShaderTPMTheatrical;
+	qhandle_t	yellowSaberGlowShaderTPMTheatrical;
+	qhandle_t	greenSaberGlowShaderTPMTheatrical;
+	qhandle_t	blueSaberGlowShaderTPMTheatrical;
+	qhandle_t	purpleSaberGlowShaderTPMTheatrical;
+	qhandle_t	rgbSaberGlowShaderTPMTheatrical; // Niksata Edit
+
+	//sfx Ahsoka // Niksata Edit
+	qhandle_t	ShaderSaberBladeAhsoka;
+	qhandle_t	ShaderSaberBladeAhsokared;
+	qhandle_t	ShaderSaberBladeAhsokaorange;
+	qhandle_t	ShaderSaberBladeAhsokayellow;
+	qhandle_t	ShaderSaberBladeAhsokagreen;
+	qhandle_t	ShaderSaberBladeAhsokablue;
+	qhandle_t	ShaderSaberBladeAhsokapurple;
+	qhandle_t	ShaderSaberBladeRGBAhsoka;
+	qhandle_t	redSaberGlowShaderAhsoka;
+	qhandle_t	orangeSaberGlowShaderAhsoka;
+	qhandle_t	yellowSaberGlowShaderAhsoka;
+	qhandle_t	greenSaberGlowShaderAhsoka;
+	qhandle_t	blueSaberGlowShaderAhsoka;
+	qhandle_t	purpleSaberGlowShaderAhsoka;
+	qhandle_t	rgbSaberGlowShaderAhsoka; // Niksata Edit
+
+	//sfx OT // Niksata Edit
+	qhandle_t	ShaderSaberBladeOT;
+	qhandle_t	ShaderSaberBladeOTred;
+	qhandle_t	ShaderSaberBladeOTredrestored;
+	qhandle_t	ShaderSaberBladeOTorange;
+	qhandle_t	ShaderSaberBladeOTyellow;
+	qhandle_t	ShaderSaberBladeOTgreen;
+	qhandle_t	ShaderSaberBladeOTgreenrestored;
+	qhandle_t	ShaderSaberBladeOTblue;
+	qhandle_t	ShaderSaberBladeOTbluerestored;
+	qhandle_t	ShaderSaberBladeOTpurple;
+	qhandle_t	ShaderSaberBladeRGBOT;
+	qhandle_t	redSaberGlowShaderOT;
+	qhandle_t	redSaberGlowShaderOTrestored;
+	qhandle_t	orangeSaberGlowShaderOT;
+	qhandle_t	yellowSaberGlowShaderOT;
+	qhandle_t	greenSaberGlowShaderOT;
+	qhandle_t	greenSaberGlowShaderOTrestored;
+	qhandle_t	blueSaberGlowShaderOT;
+	qhandle_t	blueSaberGlowShaderOTrestored;
+	qhandle_t	purpleSaberGlowShaderOT;
+	qhandle_t	rgbSaberGlowShaderOT; // Niksata Edit
 
 	//rp
 	qhandle_t saberIgnitionFlare;

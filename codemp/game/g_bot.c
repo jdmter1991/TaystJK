@@ -975,6 +975,46 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	if ( !*s )	s = "botfiles/default.jkb";
 	Info_SetValueForKey( userinfo, key, s );
 
+	//[RGBSabers] // Niksata Edit
+	key = "cp_sbRGB1";
+	s = Info_ValueForKey(botinfo, key);
+	if (!*s) {
+		s = "255,255,255";  // Default white in RGB format
+	}
+	// Convert "r,g,b" to encoded integer
+	if (strstr(s, ",")) {
+		int r, g, b;
+		sscanf(s, "%d,%d,%d", &r, &g, &b);
+		int encoded = r | (g << 8) | (b << 16);
+		Info_SetValueForKey(userinfo, "c3", va("%d", encoded));
+		Info_SetValueForKey(userinfo, "cp_sbRGB1", va("%d", encoded));
+	}
+	else {
+		// Fallback for integer format
+		Info_SetValueForKey(userinfo, "c3", s);
+		Info_SetValueForKey(userinfo, "cp_sbRGB1", s);
+	}
+
+	key = "cp_sbRGB2";
+	s = Info_ValueForKey(botinfo, key);
+	if (!*s) {
+		s = "255,255,255";  // Default white in RGB format
+	}
+	// Convert "r,g,b" to encoded integer
+	if (strstr(s, ",")) {
+		int r, g, b;
+		sscanf(s, "%d,%d,%d", &r, &g, &b);
+		int encoded = r | (g << 8) | (b << 16);
+		Info_SetValueForKey(userinfo, "c4", va("%d", encoded));
+		Info_SetValueForKey(userinfo, "cp_sbRGB2", va("%d", encoded));
+	}
+	else {
+		// Fallback for integer format
+		Info_SetValueForKey(userinfo, "c4", s);
+		Info_SetValueForKey(userinfo, "cp_sbRGB2", s);
+	}
+	//[RGBSabers] // Niksata Edit
+
 	// initialize the bot settings
 	if (level.gametype >= GT_TEAM) {
 		if (bot_team.integer == 1)

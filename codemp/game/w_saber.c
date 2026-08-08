@@ -30,6 +30,12 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 extern bot_state_t *botstates[MAX_CLIENTS];
 extern qboolean InFront( vec3_t spot, vec3_t from, vec3_t fromAngles, float threshHold );
 extern void G_TestLine(vec3_t start, vec3_t end, int color, int time);
+extern vmCvar_t g_saberAlwaysBlock; // Niksata Edit
+extern vmCvar_t japp_saberTweaks; // Niksata Edit
+extern vmCvar_t japp_saberBlockChanceMax; // Niksata Edit
+extern vmCvar_t japp_saberBlockChanceMin; // Niksata Edit
+extern vmCvar_t japp_saberBlockChanceScale; // Niksata Edit
+extern vmCvar_t japp_saberBlockStanceParity; // Niksata Edit
 
 int saberSpinSound = 0;
 
@@ -65,6 +71,14 @@ float RandFloat( float min, float max ) {
 #endif
 	return ((randActual * (max - min)) / randMax) + min;
 }
+
+float Q_clamp(float min, float value, float max) { // Niksata Edit
+	if (value < min)
+		return min;
+	if (value > max)
+		return max;
+	return value;
+} // Niksata Edit
 
 #define DEBUG_SABER_BOX 
 #ifdef DEBUG_SABER_BOX
@@ -397,9 +411,9 @@ void SaberGotHit( gentity_t *self, gentity_t *other, trace_t *trace )
 
 qboolean BG_SuperBreakLoseAnim( int anim );
 
-static QINLINE void SetSaberBoxSize(gentity_t *saberent)
+static QINLINE void SetSaberBoxSize(gentity_t* saberent) // Niksata Edit
 {
-	gentity_t *owner = NULL;
+	gentity_t* owner = NULL;
 	vec3_t saberOrg, saberTip;
 	int i;
 	int j = 0;
@@ -407,6 +421,7 @@ static QINLINE void SetSaberBoxSize(gentity_t *saberent)
 	qboolean dualSabers = qfalse;
 	qboolean alwaysBlock[MAX_SABERS][MAX_BLADES];
 	qboolean forceBlock = qfalse;
+	qboolean dynamicAlwaysBlockActive = qfalse; // NEW: Track dynamic state
 
 	assert(saberent && saberent->inuse);
 
@@ -426,41 +441,88 @@ static QINLINE void SetSaberBoxSize(gentity_t *saberent)
 		return;
 	}
 
-	if ( owner->client->saber[1].model[0] )
+	// NEW: Check if dynamic always block is enabled
+	if (g_saberAlwaysBlock.integer > 0)
+	{
+		// Check if this is a W_SABER encounter
+		if (owner->client->ps.weapon == WP_SABER)
+		{
+			dynamicAlwaysBlockActive = qtrue;
+
+			// Optional: Only activate for certain conditions
+			if (g_saberAlwaysBlock.integer == 2)
+			{
+				// Only for NPCs, not players
+				if (owner->s.number < MAX_CLIENTS)
+				{
+					dynamicAlwaysBlockActive = qfalse;
+				}
+			}
+		}
+	}
+
+	if (owner->client->saber[1].model[0])
 	{
 		dualSabers = qtrue;
 	}
 
-	if ( PM_SaberInBrokenParry(owner->client->ps.saberMove)
-		|| BG_SuperBreakLoseAnim( owner->client->ps.torsoAnim ) )
+	if (PM_SaberInBrokenParry(owner->client->ps.saberMove)
+		|| BG_SuperBreakLoseAnim(owner->client->ps.torsoAnim))
 	{ //let swings go right through when we're in this state
-		for ( i = 0; i < MAX_SABERS; i++ )
+		for (i = 0; i < MAX_SABERS; i++)
 		{
-			if ( i > 0 && !dualSabers )
+			if (i > 0 && !dualSabers)
 			{//not using a second saber, set it to not blocking
-				for ( j = 0; j < MAX_BLADES; j++ )
+				for (j = 0; j < MAX_BLADES; j++)
 				{
 					alwaysBlock[i][j] = qfalse;
 				}
 			}
 			else
 			{
-				if ( (owner->client->saber[i].saberFlags2&SFL2_ALWAYS_BLOCK) )
+				// NEW: Apply dynamic always block if enabled
+				qboolean shouldAlwaysBlock = qfalse;
+
+				if (dynamicAlwaysBlockActive)
 				{
-					for ( j = 0; j < owner->client->saber[i].numBlades; j++ )
+					shouldAlwaysBlock = qtrue;
+					forceBlock = qtrue;
+				}
+				else if ((owner->client->saber[i].saberFlags2 & SFL2_ALWAYS_BLOCK))
+				{
+					shouldAlwaysBlock = qtrue;
+					forceBlock = qtrue;
+				}
+
+				if (shouldAlwaysBlock)
+				{
+					for (j = 0; j < owner->client->saber[i].numBlades; j++)
 					{
 						alwaysBlock[i][j] = qtrue;
-						forceBlock = qtrue;
 					}
 				}
-				if ( owner->client->saber[i].bladeStyle2Start > 0 )
+
+				if (owner->client->saber[i].bladeStyle2Start > 0)
 				{
-					for ( j = owner->client->saber[i].bladeStyle2Start; j < owner->client->saber[i].numBlades; j++ )
+					for (j = owner->client->saber[i].bladeStyle2Start; j < owner->client->saber[i].numBlades; j++)
 					{
-						if ( (owner->client->saber[i].saberFlags2&SFL2_ALWAYS_BLOCK2) )
+						// NEW: Check dynamic always block for style2 blades
+						qboolean shouldAlwaysBlock2 = qfalse;
+
+						if (dynamicAlwaysBlockActive)
+						{
+							shouldAlwaysBlock2 = qtrue;
+							forceBlock = qtrue;
+						}
+						else if ((owner->client->saber[i].saberFlags2 & SFL2_ALWAYS_BLOCK2))
+						{
+							shouldAlwaysBlock2 = qtrue;
+							forceBlock = qtrue;
+						}
+
+						if (shouldAlwaysBlock2)
 						{
 							alwaysBlock[i][j] = qtrue;
-							forceBlock = qtrue;
 						}
 						else
 						{
@@ -470,10 +532,10 @@ static QINLINE void SetSaberBoxSize(gentity_t *saberent)
 				}
 			}
 		}
-		if ( !forceBlock )
+		if (!forceBlock)
 		{//no sabers/blades to FORCE to be on, so turn off blocking altogether
-			VectorSet( saberent->r.mins, 0, 0, 0 );
-			VectorSet( saberent->r.maxs, 0, 0, 0 );
+			VectorSet(saberent->r.mins, 0, 0, 0);
+			VectorSet(saberent->r.maxs, 0, 0, 0);
 #ifndef FINAL_BUILD
 			if (g_saberDebugPrint.integer > 1)
 			{
@@ -487,29 +549,29 @@ static QINLINE void SetSaberBoxSize(gentity_t *saberent)
 	if ((level.time - owner->client->lastSaberStorageTime) > 200 ||
 		(level.time - owner->client->saber[j].blade[k].storageTime) > 100)
 	{ //it's been too long since we got a reliable point storage, so use the defaults and leave.
-		VectorSet( saberent->r.mins, -SABER_BOX_SIZE, -SABER_BOX_SIZE, -SABER_BOX_SIZE );
-		VectorSet( saberent->r.maxs, SABER_BOX_SIZE, SABER_BOX_SIZE, SABER_BOX_SIZE );
+		VectorSet(saberent->r.mins, -SABER_BOX_SIZE, -SABER_BOX_SIZE, -SABER_BOX_SIZE);
+		VectorSet(saberent->r.maxs, SABER_BOX_SIZE, SABER_BOX_SIZE, SABER_BOX_SIZE);
 		return;
 	}
 
-	if ( dualSabers
-		|| owner->client->saber[0].numBlades > 1 )
+	if (dualSabers
+		|| owner->client->saber[0].numBlades > 1)
 	{//dual sabers or multi-blade saber
-		if ( owner->client->ps.saberHolstered > 1 )
+		if (owner->client->ps.saberHolstered > 1)
 		{//entirely off
 			//no blocking at all
-			VectorSet( saberent->r.mins, 0, 0, 0 );
-			VectorSet( saberent->r.maxs, 0, 0, 0 );
+			VectorSet(saberent->r.mins, 0, 0, 0);
+			VectorSet(saberent->r.maxs, 0, 0, 0);
 			return;
 		}
 	}
 	else
 	{//single saber
-		if ( owner->client->ps.saberHolstered )
+		if (owner->client->ps.saberHolstered)
 		{//off
 			//no blocking at all
-			VectorSet( saberent->r.mins, 0, 0, 0 );
-			VectorSet( saberent->r.maxs, 0, 0, 0 );
+			VectorSet(saberent->r.mins, 0, 0, 0);
+			VectorSet(saberent->r.maxs, 0, 0, 0);
 			return;
 		}
 	}
@@ -526,31 +588,31 @@ static QINLINE void SetSaberBoxSize(gentity_t *saberent)
 			{
 				break;
 			}
-			if ( dualSabers
+			if (dualSabers
 				&& owner->client->ps.saberHolstered == 1
-				&& j == 1 )
+				&& j == 1)
 			{ //this mother is holstered, get outta here.
 				j++;
 				continue;
 			}
 			for (k = 0; k < owner->client->saber[j].numBlades; k++)
 			{
-				if ( k > 0 )
+				if (k > 0)
 				{//not the first blade
-					if ( !dualSabers )
+					if (!dualSabers)
 					{//using a single saber
-						if ( owner->client->saber[j].numBlades > 1 )
+						if (owner->client->saber[j].numBlades > 1)
 						{//with multiple blades
-							if( owner->client->ps.saberHolstered == 1 )
+							if (owner->client->ps.saberHolstered == 1)
 							{//all blades after the first one are off
 								break;
 							}
 						}
 					}
 				}
-				if ( forceBlock )
+				if (forceBlock)
 				{//only do blocking with blades that are marked to block
-					if ( !alwaysBlock[j][k] )
+					if (!alwaysBlock[j][k])
 					{//this blade shouldn't be blocking
 						continue;
 					}
@@ -584,7 +646,7 @@ static QINLINE void SetSaberBoxSize(gentity_t *saberent)
 
 	VectorSubtract(saberent->r.mins, saberent->r.currentOrigin, saberent->r.mins);
 	VectorSubtract(saberent->r.maxs, saberent->r.currentOrigin, saberent->r.maxs);
-}
+} // Niksata Edit
 
 void WP_SaberInitBladeData( gentity_t *ent )
 {
@@ -3250,6 +3312,17 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 			}
 			return FORCE_LEVEL_3;
 			break;
+		case BOTH_A1_SPECIAL_YODA: // Niksata Edit
+			if (animTimer < 600)
+			{//end of anim
+				return FORCE_LEVEL_0;
+			}
+			else if (animTimeElapsed < 200)
+			{//beginning of anim
+				return FORCE_LEVEL_0;
+			}
+			return FORCE_LEVEL_3;
+			break; // Niksata Edit
 		case BOTH_A2_SPECIAL:
 			if ( animTimer < 300 )
 			{//end of anim
@@ -4265,6 +4338,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 			}
 			*/
 			if ( self->client->ps.torsoAnim == BOTH_A1_SPECIAL
+				|| self->client->ps.torsoAnim == BOTH_A1_SPECIAL_YODA // Niksata Edit
 				|| self->client->ps.torsoAnim == BOTH_A2_SPECIAL
 				|| self->client->ps.torsoAnim == BOTH_A3_SPECIAL )
 			{//parry/block/break-parry bonus for single-style kata moves
@@ -5268,6 +5342,7 @@ blockStuff:
 			{
 				int attackAdv, defendStr = G_PowerLevelForSaberAnim( otherOwner, 0, qtrue ), attackBonus = 0;
 				if ( otherOwner->client->ps.torsoAnim == BOTH_A1_SPECIAL
+					|| otherOwner->client->ps.torsoAnim == BOTH_A1_SPECIAL_YODA // Niksata Edit
 					|| otherOwner->client->ps.torsoAnim == BOTH_A2_SPECIAL
 					|| otherOwner->client->ps.torsoAnim == BOTH_A3_SPECIAL )
 				{//parry/block/break-parry bonus for single-style kata moves
@@ -9711,7 +9786,26 @@ static QINLINE qboolean WP_SaberCanBlockSwing(int ourStr, int attackStr) //If th
 }
 
 
-int WP_SaberCanBlock(gentity_t *self, vec3_t point, int dflags, int mod, qboolean projectile, int attackStr)
+static int G_SaberLevelForStance(int stance) { // Niksata Edit
+	switch (stance) {
+	case SS_FAST:
+	case SS_STAFF:
+	case SS_DUAL:
+		return 1;
+	case SS_MEDIUM:
+	case SS_TAVION:
+		return 2;
+	case SS_STRONG:
+	case SS_DESANN:
+		return 3;
+	default:
+		break;
+	}
+
+	return 0;
+} // Niksata Edit
+
+int WP_SaberCanBlock(gentity_t* self, vec3_t point, int dflags, int mod, qboolean projectile, int attackStr) // Niksata Edit
 {
 	qboolean thrownSaber = qfalse;
 	float blockFactor = 0;
@@ -9725,8 +9819,8 @@ int WP_SaberCanBlock(gentity_t *self, vec3_t point, int dflags, int mod, qboolea
 	if (SaberAttacking(self)) //attacking, can't block now
 		return 0;
 
-	if (PM_InSaberAnim(self->client->ps.torsoAnim) && !self->client->ps.saberBlocked &&	self->client->ps.saberMove != LS_READY && self->client->ps.saberMove != LS_NONE) {
-		if ( self->client->ps.saberMove < LS_PARRY_UP || self->client->ps.saberMove > LS_REFLECT_LL )
+	if (PM_InSaberAnim(self->client->ps.torsoAnim) && !self->client->ps.saberBlocked && self->client->ps.saberMove != LS_READY && self->client->ps.saberMove != LS_NONE) {
+		if (self->client->ps.saberMove < LS_PARRY_UP || self->client->ps.saberMove > LS_REFLECT_LL)
 			return 0;
 	}
 
@@ -9736,7 +9830,7 @@ int WP_SaberCanBlock(gentity_t *self, vec3_t point, int dflags, int mod, qboolea
 	if (!self->client->ps.saberEntityNum) //saber is knocked away
 		return 0;
 
-	if (BG_SabersOff( &self->client->ps ))
+	if (BG_SabersOff(&self->client->ps))
 		return 0;
 
 	if (self->client->ps.weapon != WP_SABER)
@@ -9748,7 +9842,7 @@ int WP_SaberCanBlock(gentity_t *self, vec3_t point, int dflags, int mod, qboolea
 	if (self->client->ps.saberInFlight)
 		return 0;
 
-	if (self->client->pers.cmd.buttons & BUTTON_ATTACK) //don't block when the player is trying to slash, if it's a projectile or he's doing a very strong attack
+	if (self->client->pers.cmd.buttons & BUTTON_ATTACK) //don't block when player is trying to slash, if it's a projectile or he's doing a very strong attack
 		return 0;
 
 	if (attackStr == 999) { //Moved down here
@@ -9756,12 +9850,24 @@ int WP_SaberCanBlock(gentity_t *self, vec3_t point, int dflags, int mod, qboolea
 		thrownSaber = qtrue;
 	}
 
-	//JAPRO reduce saber block
-	if (!projectile && !thrownSaber && !SaberSPStyle(self) && !WP_SaberCanBlockSwing(self->client->ps.fd.saberAnimLevel, attackStr)) {
+	// JAPP stance-based blocking system
+	if (japp_saberTweaks.integer == 1) {
+		const int ourLevel = G_SaberLevelForStance(self->client->ps.fd.saberAnimLevel);
+		const int theirLevel = G_SaberLevelForStance(attackStr);
+		const float diff = (float)(theirLevel - ourLevel);      // range [0, 2]
+		const float parity = japp_saberBlockStanceParity.value; // range [0, 3]
+		const float chanceMin = japp_saberBlockChanceMin.value;
+		const float chanceMax = japp_saberBlockChanceMax.value;
+		const float chanceScalar = japp_saberBlockChanceScale.value;
+		const float chance = Q_clamp(chanceMin, (1.0f - (diff / parity)) * chanceScalar, chanceMax);
+		if (flrand(0.0f, 1.0f) > chance) {
+			return 0;
+		}
+	}
+	// Fallback to original stance check for non-japp mode
+	else if (!projectile && !thrownSaber && !SaberSPStyle(self) && !WP_SaberCanBlockSwing(self->client->ps.fd.saberAnimLevel, attackStr)) {
 		return qfalse;
 	}
-	//end
-	//Here if their attack is weaker than our style
 
 	if (self->client->ps.saberMove != LS_READY && !self->client->ps.saberBlocking)
 		return 0;
@@ -9794,14 +9900,14 @@ int WP_SaberCanBlock(gentity_t *self, vec3_t point, int dflags, int mod, qboolea
 	if (attackStr)//blocking a saber, not a projectile.
 		blockFactor -= 0.25f;
 
-	if (!InFront( point, self->client->ps.origin, self->client->ps.viewangles, blockFactor )) //orig 0.2f , higher BlockFactor means less block.
+	if (!InFront(point, self->client->ps.origin, self->client->ps.viewangles, blockFactor)) //orig 0.2f , higher BlockFactor means less block.
 		return 0;
 
 	if (projectile)
 		WP_SaberBlockNonRandom(self, point, projectile);
 
 	return 1;
-}
+} // Niksata Edit
 
 qboolean HasSetSaberOnly(void)
 {
@@ -9835,3 +9941,69 @@ qboolean HasSetSaberOnly(void)
 
 	return qtrue;
 }
+
+qboolean WP_SaberBlockLightning(gentity_t* self, gentity_t* attacker, int* damage) // Niksata Edit
+{
+	int fpCost;
+
+	if (!self || !self->client || !attacker || !damage)
+		return qfalse;
+
+	if (!g_lightningBlockEnabled.integer)
+		return qfalse;
+
+	// Must have saber active
+	if (self->client->ps.weapon != WP_SABER || BG_SabersOff(&self->client->ps))
+		return qfalse;
+
+	// Must be in blocking stance
+	if (!self->client->ps.saberBlocking)
+		return qfalse;
+
+	fpCost = g_lightningBlockCost.integer;
+
+	// Need FP to block
+	if (self->client->ps.fd.forcePower < fpCost)
+		return qfalse;
+
+	// Spend FP and negate health damage
+	self->client->ps.fd.forcePower -= fpCost;
+	if (self->client->ps.fd.forcePower < 0)
+		self->client->ps.fd.forcePower = 0;
+
+	*damage = 0;
+
+	// -----------------------------------------
+	// OPTIONAL IMPROVEMENT: reduce animation jitter
+	// Only recompute the block direction when the current block window expires.
+	// -----------------------------------------
+	if (self->client->ps.saberBlockTime < level.time)
+	{
+		vec3_t hitloc;
+
+		// Approximate lightning "hitloc" as the attacker's eye (incoming direction)
+		if (attacker->client)
+		{
+			VectorCopy(attacker->client->ps.origin, hitloc);
+			hitloc[2] += attacker->client->ps.viewheight;
+		}
+		else
+		{
+			VectorCopy(attacker->r.currentOrigin, hitloc);
+		}
+
+		// Sets ps.saberBlocked to quadrant (top/upper-left/etc)
+		WP_SaberBlockNonRandom(self, hitloc, qfalse);
+	}
+
+	// Refresh block window so the anim system has time to show the block
+	self->client->ps.saberBlockTime = level.time + 200;
+
+	// Keep blocking state “fresh”
+	self->client->ps.saberBlocking = qtrue;
+
+	// Feedback
+	G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/weapons/saber_plasma/kr_saberblock1.wav"));
+
+	return qtrue;
+} // Niksata Edit

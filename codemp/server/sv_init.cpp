@@ -801,7 +801,7 @@ void SV_BotInitBotLib(void);
 
 #ifdef DEDICATED
 
-#define G2_VERT_SPACE_SERVER_SIZE 256
+#define G2_VERT_SPACE_SERVER_SIZE (64 * 1024) // Niksata Edit
 IHeapAllocator *G2VertSpaceServer = NULL;
 CMiniHeap IHeapAllocator_singleton(G2_VERT_SPACE_SERVER_SIZE * 1024);
 

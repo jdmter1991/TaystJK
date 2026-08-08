@@ -501,8 +501,8 @@ int PM_GetSaberStance(void)
 		return BOTH_SABERDUAL_STANCE;
 	}
 
-	switch ( pm->ps->fd.saberAnimLevel )
-	{
+	switch (pm->ps->fd.saberAnimLevel)
+	{ // Niksata Edit
 	case SS_DUAL:
 		anim = BOTH_SABERDUAL_STANCE;
 		break;
@@ -510,19 +510,23 @@ int PM_GetSaberStance(void)
 		anim = BOTH_SABERSTAFF_STANCE;
 		break;
 	case SS_FAST:
-	case SS_TAVION:
 		anim = BOTH_SABERFAST_STANCE;
+		break;
+	case SS_TAVION:
+		anim = BOTH_SABERTAVION_STANCE;
 		break;
 	case SS_STRONG:
 		anim = BOTH_SABERSLOW_STANCE;
 		break;
+	case SS_DESANN:
+		anim = BOTH_SABERDESANN_STANCE;
+		break;
 	case SS_NONE:
 	case SS_MEDIUM:
-	case SS_DESANN:
 	default:
 		anim = BOTH_STAND2;
 		break;
-	}
+	} // Niksata Edit
 	return anim;
 }
 
@@ -7833,6 +7837,8 @@ qboolean PM_AdjustStandAnimForSlope( void )
 	case BOTH_STAND2:
 	case BOTH_SABERFAST_STANCE:
 	case BOTH_SABERSLOW_STANCE:
+	case BOTH_SABERTAVION_STANCE: // Niksata Edit
+	case BOTH_SABERDESANN_STANCE: // Niksata Edit
 	case BOTH_CROUCH1IDLE:
 	case BOTH_CROUCH1:
 	case LEGS_LEFTUP1:			//# On a slope with left foot 4 higher than right
@@ -7968,6 +7974,8 @@ qboolean PM_AdjustStandAnimForSlope( void )
 		case BOTH_STAND2:
 		case BOTH_SABERFAST_STANCE:
 		case BOTH_SABERSLOW_STANCE:
+		case BOTH_SABERTAVION_STANCE: // Niksata Edit
+		case BOTH_SABERDESANN_STANCE: // Niksata Edit
 		case BOTH_CROUCH1IDLE:
 			if ( destAnim >= LEGS_LEFTUP1 && destAnim <= LEGS_LEFTUP5 )
 			{//going into left side up
@@ -8153,6 +8161,8 @@ static void PM_Footsteps( void ) {
 		|| (pm->ps->legsAnim) == BOTH_STAND2
 		|| (pm->ps->legsAnim) == BOTH_SABERFAST_STANCE
 		|| (pm->ps->legsAnim) == BOTH_SABERSLOW_STANCE
+		|| (pm->ps->legsAnim) == BOTH_SABERTAVION_STANCE // Niksata Edit
+		|| (pm->ps->legsAnim) == BOTH_SABERDESANN_STANCE // Niksata Edit
 		|| (pm->ps->legsAnim) == BOTH_BUTTON_HOLD
 		|| (pm->ps->legsAnim) == BOTH_BUTTON_RELEASE
 		|| PM_LandingAnim( (pm->ps->legsAnim) )

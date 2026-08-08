@@ -1,3 +1,27 @@
+gfx/effects/sabers/RGBglow1_rots {
+	nopicmip
+	notc
+	cull twosided
+	{
+		map gfx/effects/sabers/RGBglow1_rots
+		blendFunc GL_ONE GL_ONE
+		glow
+		rgbGen vertex
+	}
+}
+
+gfx/effects/sabers/RGBglow1_tpm4k {
+	nopicmip
+	notc
+	cull twosided
+	{
+		map gfx/effects/sabers/RGBglow1_tpm4k
+		blendFunc GL_ONE GL_ONE
+		glow
+		rgbGen vertex
+	}
+}
+
 gfx/effects/sabers/RGBglow1 {
 	nopicmip
 	notc
@@ -129,6 +153,7 @@ gfx/effects/sabers/blackcore {
 	nopicmip
 	notc
 	cull twosided
+    	sort additive        // <-- Add this line
 	{
 		clampmap gfx/effects/sabers/blackcore
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA

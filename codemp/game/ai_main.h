@@ -134,7 +134,7 @@ typedef struct botattachment_s
 typedef struct nodeobject_s
 {
 	vec3_t origin;
-//	int index;
+	//	int index;
 	float weight;
 	int flags;
 	int neighbornum;
@@ -157,6 +157,23 @@ typedef struct botskills_s
 	float				maxturn;
 	int					perfectaim;
 } botskills_t;
+
+// ================================ // Niksata Edit
+// ADVANCED BLOCKING SYSTEM
+// ================================
+typedef struct {
+	int enemySwingStage;          // Current stage (1-8) of enemy swing
+	float enemyAttackPower;        // Calculated attack power from swing
+	int enemyStance;             // Enemy saber stance (Strong/Medium/Fast/Staff/Dual)
+	qboolean enemyMoving;          // Is enemy currently moving?
+	int lastBlockTime;            // Last successful block timestamp
+	int lastParryTime;           // Last successful parry timestamp
+	int blockStreak;             // Consecutive successful blocks
+	float blockConfidence;         // Bot's confidence in blocking (0.0-1.0)
+	vec3_t optimalBlockAngle;     // Ideal direction for blocking
+	qboolean shouldParry;         // Ready to execute parry
+	int parryWindow;             // Parry timing window (level.time + duration)
+} botBlocking_t; // Niksata Edit
 
 //bot state
 typedef struct bot_state_s
@@ -183,20 +200,20 @@ typedef struct bot_state_s
 	vec3_t viewanglespeed;
 
 	//rww - new AI values
-	gentity_t			*currentEnemy;
-	gentity_t			*revengeEnemy;
+	gentity_t* currentEnemy;
+	gentity_t* revengeEnemy;
 
-	gentity_t			*squadLeader;
+	gentity_t* squadLeader;
 
-	gentity_t			*lastHurt;
-	gentity_t			*lastAttacked;
+	gentity_t* lastHurt;
+	gentity_t* lastAttacked;
 
-	gentity_t			*wantFlag;
+	gentity_t* wantFlag;
 
-	gentity_t			*touchGoal;
-	gentity_t			*shootGoal;
+	gentity_t* touchGoal;
+	gentity_t* shootGoal;
 
-	gentity_t			*dangerousObject;
+	gentity_t* dangerousObject;
 
 	vec3_t				staticFlagSpot;
 
@@ -208,9 +225,9 @@ typedef struct bot_state_s
 
 	int					lastDeadTime;
 
-	wpobject_t			*wpCurrent;
-	wpobject_t			*wpDestination;
-	wpobject_t			*wpStoreDest;
+	wpobject_t* wpCurrent;
+	wpobject_t* wpDestination;
+	wpobject_t* wpStoreDest;
 	vec3_t				goalAngles;
 	vec3_t				goalMovedir;
 	vec3_t				goalPosition;
@@ -254,8 +271,8 @@ typedef struct bot_state_s
 
 	int					isCamper;
 	float				isCamping;
-	wpobject_t			*wpCamping;
-	wpobject_t			*wpCampingTo;
+	wpobject_t* wpCamping;
+	wpobject_t* wpCampingTo;
 	qboolean			campStanding;
 
 	int					randomNavTime;
@@ -270,8 +287,8 @@ typedef struct bot_state_s
 	float				chatTime_stored;
 	int					doChat;
 	int					chatTeam;
-	gentity_t			*chatObject;
-	gentity_t			*chatAltObject;
+	gentity_t* chatObject;
+	gentity_t* chatAltObject;
 
 	float				meleeStrafeTime;
 	int					meleeStrafeDir;
@@ -354,30 +371,185 @@ typedef struct bot_state_s
 	int					forceMove_Right;
 	int					forceMove_Up;
 	//end rww
+	int feintTime;          // when feint started // Niksata Edit
+	qboolean isFeinting;    // currently performing a feint // Niksata Edit
+	// --- Adaptive Duel Learning --- // Niksata Edit
+	int swingMemoryRight; // Niksata Edit
+	int swingMemoryLeft; // Niksata Edit
+	int swingMemoryBack; // Niksata Edit
+	// --- Ultra Instinct Tuning --- // Niksata Edit
+	float uiDodgeBias;      // dynamic dodge personality // Niksata Edit
+	float uiAimJitter;      // smooth aim variation // Niksata Edit
+	int   uiLastEnemyDir;   // last known relative enemy dir // Niksata Edit
+	int evadeSideCooldown; // Niksata Edit
+	int strafeDir;          // -1 = left, 1 = right, 0 = none // Niksata Edit
+	int strafeExpireTime;   // when to stop strafing // Niksata Edit
+	int forwardDir;         // 1 = back, 2 = forward // Niksata Edit
+	int forwardDirExpire;   // when to pick new forward/back direction // Niksata Edit
+	int strafeDirExpire;    // when to pick new strafe direction // Niksata Edit
+	struct { // Niksata Edit
+		int weapon;                 // WP_SABER, WP_NONE // Niksata Edit
+		int saberMove;               // LS_* swing enum // Niksata Edit
+		int torsoTimer;              // Swing animation timer // Niksata Edit
+		int groundEntityNum;         // ENTITYNUM_NONE if in air // Niksata Edit
+	}; // Niksata Edit
+	int stuckTurnTime; // Niksata Edit
+	int useTime; // Niksata Edit
+	int wpSpecial; // Niksata Edit
+	botBlocking_t blocking; // Advanced blocking system // Niksata Edit
+	int numEnemies; // Number of enemies bot is currently fighting // Niksata Edit
+	// Advanced combat timing // Niksata Edit
+	int lastDanceTime; // Niksata Edit
+	int styleSwitchTime; // Niksata Edit
+	int delayAttackTime; // Niksata Edit
+	// Kata tracking // Niksata Edit
+	int lastKataTime; // Niksata Edit
+	int kataStreak; // Niksata Edit
+	int lastStyleSwitchTime; // Niksata Edit
+	// Jump timing control
+	int noJumpTime;                    // Time when bot can jump again // Niksata Edit
+	// Enemy position tracking for prediction // Niksata Edit
+	vec3_t lastEnemyPos;               // Last known enemy position // Niksata Edit
+	int lastEnemyTime;                  // Time when last enemy position was recorded // Niksata Edit
+	// Add these fields if using enhanced version:
+	float recentSwingMemoryLeft;         // Recent left swing memory
+	float recentSwingMemoryRight;        // Recent right swing memory  
+	float recentSwingMemoryBack;         // Recent back swing memory
+	int lastSwingUpdateTime;             // Time when recent swing memory was last updated
+	// Special move state management (Niksata Edit)
+	int currentSpecial;        // Current special move type (0=none, 1=kata, etc.)
+	int lastSpecialTime;       // Time when last special was started
+	int specialDuration;       // Duration of current special move in milliseconds
+	int obstacleMemory[8];           // Remember last 8 obstacle positions  
+	int obstacleMemoryIndex;          // Current index in obstacle memory
+	int stuckCounter;                // How long we've been stuck
+	vec3_t lastValidPosition;        // Last known good position
+	int lastPositionTime;            // When we were at last valid position
+	int avoidanceDirection;          // Current avoidance direction (-1=left, 1=right, 0=none)
+	int avoidanceTimer;              // How long to continue avoidance
+	// Combat timing variables
+	int nextAttackTime;
+	int attackRecoveryTime;
+	int lastAttackTime;
+	int lastAttackType;
+	int comboWindow;
+	int lastComboTime;
+	int lastAttackHitTime;
+
+	// Special move timing
+	int nextSpecialMoveTime;
+	int lastSpecialMoveTime;
+
+	// Dynamic movement
+	int combatStrafeTime;
+	int combatStrafeDir;
+	qboolean isAttacking;
+
+	// Movement prediction
+	vec3_t lastEnemyVelocity;
+	int enemyMovementHistoryTime;
+	float lastEnemyDistance;
+	vec3_t lastKnownWaypointPos; // Last known waypoint position for exploration
+	int forceJumpTime;
+	int nextAllowedJumpTime;
+	int jumpReleaseTime;
+	int lastObstacleTime;
+	int noRetreatTime;
 } bot_state_t;
 
-void *B_TempAlloc(int size);
+// ================================// Niksata Edit
+// PERFECT BLOCKING FUNCTION DECLARATIONS
+// ================================
+void Bot_InitPerfectBlocking(bot_state_t* bs);
+void Bot_AnalyzeEnemyAttack(bot_state_t* bs);
+void Bot_ExecutePerfectBlocking(bot_state_t* bs);
+qboolean Bot_ShouldParry(bot_state_t* bs);
+void Bot_ExecuteParry(bot_state_t* bs); // Niksata Edit
+
+// ================================ // Niksata Edit
+// TACTICAL STYLE ADVANTAGE SYSTEM
+// ================================
+float Bot_GetStyleAdvantage(int myStyle, int enemyStyle);
+
+// ================================
+// INTELLIGENT SABER STYLE SELECTION
+// ================================
+void Bot_SelectOptimalSaberStyle(bot_state_t* bs); // Niksata Edit
+
+// ================================ // Niksata Edit
+// ADVANCED COMBAT FUNCTION DECLARATIONS
+// ================================
+void Bot_ExecuteSaberDance(bot_state_t* bs);
+void Bot_ExecuteRushAttack(bot_state_t* bs);
+void Bot_ExecuteHurricane(bot_state_t* bs);
+void Bot_ExecuteStyleSwitch(bot_state_t* bs);
+void Bot_ExecuteDelayAttack(bot_state_t* bs);
+void Bot_ExecuteConvergentAttack(bot_state_t* bs);
+void Bot_ExecuteStaticAttack(bot_state_t* bs);
+void Bot_ExecuteThreeSwingCombo(bot_state_t* bs);
+void Bot_ExecuteDefensiveCounter(bot_state_t* bs);
+void Bot_ExecuteLungeAttack(bot_state_t* bs); // Niksata Edit
+
+// ================================ // Niksata Edit
+// KATA SPECIAL ATTACK DECLARATION
+// ================================
+void Bot_ExecuteKataAttack(bot_state_t* bs); // Niksata Edit
+
+extern vmCvar_t g_lightningBlockEnabled; // Niksata Edit
+extern vmCvar_t g_lightningBlockCost; // Niksata Edit
+extern vmCvar_t g_lightningBlockReduction; // Niksata Edit
+qboolean WP_SaberBlockLightning(gentity_t* self, gentity_t* attacker, int* damage); // Niksata Edit
+
+// Enhanced combat functions // Niksata Edit
+qboolean BotCanHitEnemy(bot_state_t* bs);
+qboolean BotShouldAttack(bot_state_t* bs);
+void BotPredictEnemyPosition(bot_state_t* bs, vec3_t predictedPos);
+float BotGetPredictionTime(bot_state_t* bs);
+int BotAnalyzeMovementPattern(bot_state_t* bs);
+void BotPredictStrafingMovement(bot_state_t* bs, vec3_t enemyVel, float predictionTime, vec3_t predictedPos);
+void BotPredictJumpingMovement(bot_state_t* bs, vec3_t enemyVel, float predictionTime, vec3_t predictedPos);
+void BotPredictRetreatingMovement(bot_state_t* bs, vec3_t enemyVel, float predictionTime, vec3_t predictedPos);
+void BotPredictChargingMovement(bot_state_t* bs, vec3_t enemyVel, float predictionTime, vec3_t predictedPos);
+
+// Attack timing functions
+qboolean BotCanAttackNow(bot_state_t* bs);
+void BotExecuteAttack(bot_state_t* bs);
+float BotGetAttackDelay(bot_state_t* bs);
+int BotGetCurrentAttackType(bot_state_t* bs);
+void BotUpdateAttackTiming(bot_state_t* bs);
+qboolean BotShouldAttackNow(bot_state_t* bs);
+
+// Dynamic movement functions
+void BotDynamicCombatMovement(bot_state_t* bs);
+float BotGetOptimalCombatDistance(bot_state_t* bs);
+qboolean BotShouldStrafeInCombat(bot_state_t* bs);
+void BotCombatStrafe(bot_state_t* bs, vec3_t moveDir);
+int BotSelectStrafeDirection(bot_state_t* bs);
+void BotUpdateDynamicMovement(bot_state_t* bs);
+void BotMovementDuringAttack(bot_state_t* bs); // Niksata Edit
+
+void* B_TempAlloc(int size);
 void B_TempFree(int size);
 
-void *B_Alloc(int size);
-void B_Free(void *ptr);
+void* B_Alloc(int size);
+void B_Free(void* ptr);
 
 //resets the whole bot state
-void BotResetState(bot_state_t *bs);
+void BotResetState(bot_state_t* bs);
 //returns the number of bots in the game
 int NumBots(void);
 
-void BotUtilizePersonality(bot_state_t *bs);
-int BotDoChat(bot_state_t *bs, char *section, int always);
-void StandardBotAI(bot_state_t *bs, float thinktime);
-void NewBotAI(bot_state_t *bs, float thinktime);
+void BotUtilizePersonality(bot_state_t* bs);
+int BotDoChat(bot_state_t* bs, char* section, int always);
+void StandardBotAI(bot_state_t* bs, float thinktime);
+void NewBotAI(bot_state_t* bs, float thinktime);
 void BotWaypointRender(void);
 int OrgVisibleBox(vec3_t org1, vec3_t mins, vec3_t maxs, vec3_t org2, int ignore);
-int BotIsAChickenWuss(bot_state_t *bs);
+int BotIsAChickenWuss(bot_state_t* bs);
 int GetNearestVisibleWP(vec3_t org, int ignore);
-int GetBestIdleGoal(bot_state_t *bs);
+int GetBestIdleGoal(bot_state_t* bs);
 
-char *ConcatArgs( int start );
+char* ConcatArgs(int start);
 
 extern vmCvar_t bot_forcepowers;
 extern vmCvar_t bot_forgimmick;
@@ -396,13 +568,13 @@ extern vmCvar_t bot_wp_clearweight;
 extern vmCvar_t bot_wp_distconnect;
 extern vmCvar_t bot_wp_visconnect;
 
-extern wpobject_t *flagRed;
-extern wpobject_t *oFlagRed;
-extern wpobject_t *flagBlue;
-extern wpobject_t *oFlagBlue;
+extern wpobject_t* flagRed;
+extern wpobject_t* oFlagRed;
+extern wpobject_t* flagBlue;
+extern wpobject_t* oFlagBlue;
 
-extern gentity_t *eFlagRed;
-extern gentity_t *eFlagBlue;
+extern gentity_t* eFlagRed;
+extern gentity_t* eFlagBlue;
 
 extern char gBotChatBuffer[MAX_CLIENTS][MAX_CHAT_BUFFER_SIZE];
 extern float gWPRenderTime;
@@ -410,7 +582,7 @@ extern float gDeactivated;
 extern float gBotEdit;
 extern int gWPRenderedFrame;
 
-extern wpobject_t *gWPArray[MAX_WPARRAY_SIZE];
+extern wpobject_t* gWPArray[MAX_WPARRAY_SIZE];
 extern int gWPNum;
 
 extern int gLastPrintedIndex;

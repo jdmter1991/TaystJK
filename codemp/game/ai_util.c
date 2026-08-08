@@ -890,3 +890,72 @@ void BotUtilizePersonality(bot_state_t *bs)
 	B_TempFree(65536); //group
 	trap->FS_Close(f);
 }
+// ================================
+// Niksata Edit
+// ENEMY SWING LEARNING (with decay)
+// ================================
+// ENHANCED VERSION - Works with both total and recent memory
+void Bot_UpdateEnemySwingMemory(bot_state_t* bs) {
+	if (!bs || !bs->currentEnemy || !bs->currentEnemy->client) return;
+
+	int move = bs->currentEnemy->client->ps.saberMove;
+	int animTime = bs->currentEnemy->client->ps.torsoTimer;
+
+	// More aggressive decay for faster adaptation
+	float decayRate = 0.88f; // Was 0.92f
+
+	// Add swing intensity weighting
+	float swingWeight = 1.0f;
+	if (animTime > 200) swingWeight = 1.5f; // Heavy swings matter more
+
+	// Enhanced swing detection
+	if (move >= LS_A_L2R && move <= LS_A_BL2TR) {
+		// Left swings
+		if (move == LS_A_L2R || move == LS_S_L2R ||
+			move == LS_A_TL2BR || move == LS_S_TL2BR) {
+
+			// Update both total and recent memory
+			bs->swingMemoryLeft += swingWeight;
+			bs->recentSwingMemoryLeft += swingWeight;
+		}
+		// Right swings  
+		else if (move == LS_A_R2L || move == LS_S_R2L ||
+			move == LS_A_TR2BL || move == LS_S_TR2BL) {
+
+			// Update both total and recent memory
+			bs->swingMemoryRight += swingWeight;
+			bs->recentSwingMemoryRight += swingWeight;
+		}
+		// Top swings
+		else if (move == LS_A_T2B || move == LS_S_T2B) {
+
+			// Update both total and recent memory
+			bs->swingMemoryBack += swingWeight;
+			bs->recentSwingMemoryBack += swingWeight;
+		}
+	}
+
+	// Apply decay to total memory
+	bs->swingMemoryLeft *= decayRate;
+	bs->swingMemoryRight *= decayRate;
+	bs->swingMemoryBack *= decayRate;
+
+	// Apply faster decay to recent memory (for more responsive dodging)
+	float recentDecayRate = 0.82f; // Faster decay for recent memory
+	bs->recentSwingMemoryLeft *= recentDecayRate;
+	bs->recentSwingMemoryRight *= recentDecayRate;
+	bs->recentSwingMemoryBack *= recentDecayRate;
+
+	// Cap total memory to prevent overflow
+	bs->swingMemoryLeft = Com_Clamp(0.0f, 10.0f, bs->swingMemoryLeft);
+	bs->swingMemoryRight = Com_Clamp(0.0f, 10.0f, bs->swingMemoryRight);
+	bs->swingMemoryBack = Com_Clamp(0.0f, 10.0f, bs->swingMemoryBack);
+
+	// Cap recent memory to prevent overflow
+	bs->recentSwingMemoryLeft = Com_Clamp(0.0f, 5.0f, bs->recentSwingMemoryLeft);
+	bs->recentSwingMemoryRight = Com_Clamp(0.0f, 5.0f, bs->recentSwingMemoryRight);
+	bs->recentSwingMemoryBack = Com_Clamp(0.0f, 5.0f, bs->recentSwingMemoryBack);
+
+	// Update timestamp for recent memory decay
+	bs->lastSwingUpdateTime = level.time;
+} // Niksata Edit

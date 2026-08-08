@@ -1834,13 +1834,13 @@ void ForceLightning( gentity_t *self )
 	WP_ForcePowerStart( self, FP_LIGHTNING, 500 );
 }
 
-void ForceLightningDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec3_t impactPoint )
+void ForceLightningDamage(gentity_t* self, gentity_t* traceEnt, vec3_t dir, vec3_t impactPoint) // Niksata Edit
 {
 	self->client->dangerTime = level.time;
 	self->client->ps.eFlags &= ~EF_INVULNERABLE;
 	self->client->invulnerableTimer = 0;
 
-	if ( traceEnt && traceEnt->takedamage )
+	if (traceEnt && traceEnt->takedamage)
 	{
 		if (!traceEnt->client && traceEnt->s.eType == ET_NPC)
 		{ //g2animent
@@ -1849,7 +1849,7 @@ void ForceLightningDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec
 				traceEnt->s.genericenemyindex = level.time + 2000;
 			}
 		}
-		if ( traceEnt->client )
+		if (traceEnt->client)
 		{//an enemy or object
 			if (traceEnt->client->noLightningTime >= level.time)
 			{ //give them power and don't hurt them.
@@ -1862,15 +1862,21 @@ void ForceLightningDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec
 			}
 			if (ForcePowerUsableOn(self, traceEnt, FP_LIGHTNING))
 			{
-//[JAPRO - Serverside - Saber - Tweak force lightning - Start]
+				//[JAPRO - Serverside - Saber - Tweak force lightning - Start]
 				int	dmg;
 				int modPowerLevel = -1;
 
 				if (g_fixLightning.integer > 1)//2,3 has nerfed dmg
 					dmg = 1;
 				else
-					dmg = Q_irand(1,2);
-//[JAPRO - Serverside - Saber - Tweak force lightning - End]	
+					dmg = Q_irand(1, 2);
+				//[JAPRO - Serverside - Saber - Tweak force lightning - End]	
+
+				// NEW: Lightning blocking check - damages FP only
+				qboolean blocked = qfalse;
+				if (traceEnt->client->ps.weapon == WP_SABER && !BG_SabersOff(&traceEnt->client->ps)) {
+					blocked = WP_SaberBlockLightning(traceEnt, self, &dmg);
+				}
 
 				if (traceEnt->client)
 				{
@@ -1896,26 +1902,28 @@ void ForceLightningDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec
 					}
 				}
 
-				if ( self->client->ps.weapon == WP_MELEE
-					&& self->client->ps.fd.forcePowerLevel[FP_LIGHTNING] > FORCE_LEVEL_2 )
+				if (self->client->ps.weapon == WP_MELEE
+					&& self->client->ps.fd.forcePowerLevel[FP_LIGHTNING] > FORCE_LEVEL_2)
 				{//2-handed lightning
 					//jackin' 'em up, Palpatine-style
 //[JAPRO - Serverside - Saber - Tweak force lightning - Start]
 					if (g_fixLightning.integer < 3)//0,1,2 has buffed melee dmg
 						dmg *= 2;
-//[JAPRO - Serverside - Saber - Tweak force lightning - End]
+					//[JAPRO - Serverside - Saber - Tweak force lightning - End]
 				}
 
-				if (dmg)
+				// Only apply damage if not blocked (or if blocking failed due to no FP)
+				if (dmg && !blocked)
 				{
 					//rww - Shields can now absorb lightning too.
-					G_Damage( traceEnt, self, self, dir, impactPoint, dmg, 0, MOD_FORCE_DARK );
+					G_Damage(traceEnt, self, self, dir, impactPoint, dmg, 0, MOD_FORCE_DARK);
 				}
-				if ( traceEnt->client )
+
+				if (traceEnt->client)
 				{
-					if ( !Q_irand( 0, 2 ) )
+					if (!Q_irand(0, 2))
 					{
-						G_Sound( traceEnt, CHAN_BODY, G_SoundIndex( va("sound/weapons/force/lightninghit%i", Q_irand(1, 3) )) );
+						G_Sound(traceEnt, CHAN_BODY, G_SoundIndex(va("sound/weapons/lightning/lg_hum", Q_irand(1, 3))));
 					}
 
 					if (traceEnt->client->sess.movementStyle == MV_COOP_JKA) {
@@ -1925,16 +1933,16 @@ void ForceLightningDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec
 					{ //only update every 400ms to reduce bandwidth usage (as it is passing a 32-bit time value)
 						traceEnt->client->ps.electrifyTime = level.time + 800;
 					}
-					if ( traceEnt->client->ps.powerups[PW_CLOAKED] )
+					if (traceEnt->client->ps.powerups[PW_CLOAKED])
 					{//disable cloak temporarily
-						Jedi_Decloak( traceEnt );
-						traceEnt->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
+						Jedi_Decloak(traceEnt);
+						traceEnt->client->cloakToggleTime = level.time + Q_irand(3000, 10000);
 					}
 				}
 			}
 		}
 	}
-}
+} // Niksata Edit
 
 void ForceShootLightning( gentity_t *self )
 {
