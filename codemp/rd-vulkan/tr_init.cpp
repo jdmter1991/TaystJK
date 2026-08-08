@@ -923,7 +923,7 @@ void R_Register( void )
 	ri.Cvar_CheckRange(r_ext_supersample, 0, 1, qtrue);
 	r_ext_alpha_to_coverage				= ri.Cvar_Get("r_ext_alpha_to_coverage",			"0",						CVAR_ARCHIVE_ND | CVAR_LATCH, "");
 	ri.Cvar_CheckRange(r_ext_alpha_to_coverage, 0, 1, qtrue);
-	r_fbo								= ri.Cvar_Get("r_fbo",								"0",						CVAR_ARCHIVE_ND | CVAR_LATCH, "");
+	r_fbo								= ri.Cvar_Get("r_fbo",								"1",						CVAR_ARCHIVE_ND | CVAR_LATCH, ""); // Niksata Edit
 	r_hdr								= ri.Cvar_Get("r_hdr",								"1",						CVAR_ARCHIVE | CVAR_LATCH, "");
 	r_mapGreyScale						= ri.Cvar_Get("r_mapGreyScale",						"0",						CVAR_ARCHIVE_ND | CVAR_LATCH, "");
 	ri.Cvar_CheckRange(r_mapGreyScale, -1, 1, qfalse);
@@ -935,7 +935,7 @@ void R_Register( void )
 	ri.Cvar_CheckRange(r_dither, 0, 1, qtrue);
 	r_presentBits						= ri.Cvar_Get("r_presentBits",						"24",						CVAR_ARCHIVE_ND | CVAR_LATCH, "Select color bits used for presentation surfaces\nRequires " S_COLOR_CYAN "\\r_fbo 1");
 	ri.Cvar_CheckRange(r_presentBits, 16, 30, qtrue);
-	r_bloom								= ri.Cvar_Get("r_bloom",							"0",						CVAR_ARCHIVE_ND | CVAR_LATCH, "Enable bloom effect\nRequires " S_COLOR_CYAN "\\r_fbo 1");
+	r_bloom								= ri.Cvar_Get("r_bloom",							"1",						CVAR_ARCHIVE_ND | CVAR_LATCH, "Enable bloom effect\nRequires " S_COLOR_CYAN "\\r_fbo 1"); // Niksata Edit
 	ri.Cvar_CheckRange(r_bloom, 0, 1, qtrue);
 	r_bloom_threshold					= ri.Cvar_Get("r_bloom_threshold",					"0.05",						CVAR_ARCHIVE_ND | CVAR_LATCH, "Color level to extract to bloom texture, default is 0.05");
 	ri.Cvar_CheckRange(r_bloom_threshold, 0.01f, 1, qfalse);
@@ -959,7 +959,7 @@ void R_Register( void )
 	r_nomip								= ri.Cvar_Get("r_nomip",							"0",						CVAR_ARCHIVE | CVAR_LATCH, "Apply picmip only on worldspawn textures");
 	ri.Cvar_CheckRange(r_nomip, 0, 1, qtrue);
 #ifdef USE_VBO
-	r_vbo								= ri.Cvar_Get("r_vbo",								"0",						CVAR_ARCHIVE | CVAR_LATCH, "Cache static world surfaces");
+	r_vbo								= ri.Cvar_Get("r_vbo",								"0",						CVAR_ARCHIVE | CVAR_LATCH, "Cache static world surfaces"); 
 	r_vbo_models						= ri.Cvar_Get("r_vbo_models",						"0",						CVAR_ARCHIVE | CVAR_LATCH, "Cache ghoul2 and md3 model surfaces");
 #endif
 	r_renderWidth						= ri.Cvar_Get("r_renderWidth",						"800",						CVAR_ARCHIVE_ND | CVAR_LATCH, "");
