@@ -8452,23 +8452,23 @@ void BotDynamicCombatMovement(bot_state_t* bs)
 float BotGetOptimalCombatDistance(bot_state_t* bs)
 {
 	//float baseDistance = 80.0f;
-	float baseDistance = 96.0f; // Increase for more spacing // mouse wiggle tuning
+	float baseDistance = 64.0f; // Increase for more spacing // mouse wiggle tuning
 
 	switch (bs->cur_ps.fd.saberAnimLevel) {
 	case SS_FAST:
-		baseDistance = 64.0f; // Close range for fast style
+		baseDistance = 40.0f; // Close range for fast style
 		break;
 	case SS_MEDIUM:
-		baseDistance = 80.0f; // Medium range
+		baseDistance = 56.0f; // Medium range
 		break;
 	case SS_STRONG:
-		baseDistance = 96.0f; // Longer range for strong style
+		baseDistance = 72.0f; // Longer range for strong style
 		break;
 	case SS_DUAL:
-		baseDistance = 72.0f; // Slightly closer for dual
+		baseDistance = 56.0f; // Slightly closer for dual
 		break;
 	case SS_STAFF:
-		baseDistance = 88.0f; // Medium-long for staff
+		baseDistance = 72.0f; // Medium-long for staff
 		break;
 	default:
 		baseDistance = 80.0f;
@@ -10126,51 +10126,51 @@ void Bot_ExecuteSaberCombat(bot_state_t* bs) {
 	// Adjust ranges based on current saber style
 	switch (bs->cur_ps.fd.saberAnimLevel) {
 	case SS_FAST: // Blue style - very close range
-		SABER_RANGE = 50;    // Reduced from 60
-		CLOSE_RANGE = 32;     // Reduced from 40
-		LUNGE_MIN = 60;       // Reduced from 70
-		LUNGE_MAX = 90;       // Reduced from 110
+		SABER_RANGE = 40;    // Reduced from 60
+		CLOSE_RANGE = 24;     // Reduced from 40
+		LUNGE_MIN = 50;       // Reduced from 70
+		LUNGE_MAX = 80;       // Reduced from 110
 		SPECIAL_RANGE = 150;  // Reduced from 180
 		break;
 
 	case SS_MEDIUM: // Yellow style - close-medium range
-		SABER_RANGE = 60;     // Reduced from 70
-		CLOSE_RANGE = 40;     // Reduced from 48
-		LUNGE_MIN = 75;       // Reduced from 85
-		LUNGE_MAX = 105;      // Reduced from 125
+		SABER_RANGE = 50;     // Reduced from 70
+		CLOSE_RANGE = 32;     // Reduced from 48
+		LUNGE_MIN = 65;       // Reduced from 85
+		LUNGE_MAX = 95;      // Reduced from 125
 		SPECIAL_RANGE = 190;   // Reduced from 220
 		break;
 
 	case SS_STRONG: // Red style - medium range
-		SABER_RANGE = 70;     // Reduced from 80
-		CLOSE_RANGE = 45;     // Reduced from 54
-		LUNGE_MIN = 85;       // Reduced from 95
-		LUNGE_MAX = 120;      // Reduced from 140
+		SABER_RANGE = 60;     // Reduced from 80
+		CLOSE_RANGE = 36;     // Reduced from 54
+		LUNGE_MIN = 75;       // Reduced from 95
+		LUNGE_MAX = 110;      // Reduced from 140
 		SPECIAL_RANGE = 220;  // Reduced from 256
 		break;
 
 	case SS_DESANN: // Desann style - medium-long range
-		SABER_RANGE = 75;     // Reduced from 85
-		CLOSE_RANGE = 50;     // Reduced from 58
-		LUNGE_MIN = 90;       // Reduced from 100
-		LUNGE_MAX = 130;      // Reduced from 150
-		SPECIAL_RANGE = 240;  // Reduced from 280
+		SABER_RANGE = 60;     // Reduced from 80
+		CLOSE_RANGE = 36;     // Reduced from 54
+		LUNGE_MIN = 75;       // Reduced from 95
+		LUNGE_MAX = 110;      // Reduced from 140
+		SPECIAL_RANGE = 220;  // Reduced from 256
 		break;
 
 	case SS_TAVION: // Tavion style - fast-medium
-		SABER_RANGE = 55;     // Reduced from 65
-		CLOSE_RANGE = 36;     // Reduced from 44
-		LUNGE_MIN = 68;       // Reduced from 78
-		LUNGE_MAX = 98;       // Reduced from 118
-		SPECIAL_RANGE = 170;  // Reduced from 200
+		SABER_RANGE = 40;    // Reduced from 60
+		CLOSE_RANGE = 24;     // Reduced from 40
+		LUNGE_MIN = 50;       // Reduced from 70
+		LUNGE_MAX = 80;       // Reduced from 110
+		SPECIAL_RANGE = 150;  // Reduced from 180
 		break;
 
 	default: // Fallback to medium values
-		SABER_RANGE = 60;
-		CLOSE_RANGE = 40;
-		LUNGE_MIN = 75;
-		LUNGE_MAX = 105;
-		SPECIAL_RANGE = 190;
+		SABER_RANGE = 50;     // Reduced from 70
+		CLOSE_RANGE = 32;     // Reduced from 48
+		LUNGE_MIN = 65;       // Reduced from 85
+		LUNGE_MAX = 95;      // Reduced from 125
+		SPECIAL_RANGE = 190;   // Reduced from 220
 		break;
 	}
 
@@ -11011,8 +11011,8 @@ void NewBotAI_GetMovement(bot_state_t* bs) {
 	// ================================
 	// ENHANCED DYNAMIC COMBAT BAND
 	// ================================
-	const float IDEAL_MIN = 50.0f;
-	const float IDEAL_MAX = 100.0f;
+	const float IDEAL_MIN = 30.0f;
+	const float IDEAL_MAX = 70.0f;
 
 	// Adjust ideal range based on situation
 	float adjustedMin = IDEAL_MIN;
@@ -11038,7 +11038,7 @@ void NewBotAI_GetMovement(bot_state_t* bs) {
 	}
 
 	// Too close - strong retreat
-	if (dist < adjustedMin) {
+	if (dist < adjustedMin - 10) {
 		// Enhanced retreat with obstacle awareness
 		vec3_t forward;
 		AngleVectors(bs->viewangles, forward, NULL, NULL);
@@ -11065,7 +11065,7 @@ void NewBotAI_GetMovement(bot_state_t* bs) {
 	}
 
 	// Too far - aggressive close-in
-	if (dist > adjustedMax) {
+	if (dist > adjustedMax - 20) {
 		// Enhanced advance with obstacle awareness
 		vec3_t forward;
 		AngleVectors(bs->viewangles, forward, NULL, NULL);
