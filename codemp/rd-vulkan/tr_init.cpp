@@ -940,7 +940,7 @@ void R_Register( void )
 	r_bloom_threshold					= ri.Cvar_Get("r_bloom_threshold",					"0.05",						CVAR_ARCHIVE_ND | CVAR_LATCH, "Color level to extract to bloom texture, default is 0.05");
 	ri.Cvar_CheckRange(r_bloom_threshold, 0.01f, 1, qfalse);
 	r_bloom_threshold_mode				= ri.Cvar_Get("r_bloom_threshold_mode",				"0",						CVAR_ARCHIVE_ND, "Color extraction mode:\n 0: (r|g|b) >= threshold\n 1: (r + g + b ) / 3 >= threshold\n 2: luma(r, g, b) >= threshold");
-	r_bloom_intensity					= ri.Cvar_Get("r_bloom_intensity",					"0.15",						CVAR_ARCHIVE_ND | CVAR_LATCH, "Final bloom blend factor, default is 0.15");
+	r_bloom_intensity					= ri.Cvar_Get("r_bloom_intensity",					"0.1",						CVAR_ARCHIVE_ND | CVAR_LATCH, "Final bloom blend factor, default is 0.15"); // Niksata Edit
 	ri.Cvar_CheckRange(r_bloom_intensity, 0.01f, 2, qfalse);
 	r_bloom_modulate					= ri.Cvar_Get("r_bloom_modulate",					"0",						CVAR_ARCHIVE_ND, "Modulate extracted color:\n 0: off (color = color, i.e. no changes)\n 1: by itself (color = color * color)\n 2: by intensity (color = color * luma(color))");
 #ifdef USE_PMLIGHT
