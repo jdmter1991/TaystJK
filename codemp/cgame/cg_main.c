@@ -743,6 +743,23 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.purpleSaberGlowShaderOT = trap->R_RegisterShader("gfx/effects/sabers/ot_purple_glow"); // Niksata Edit
 	cgs.media.rgbSaberGlowShaderOT = trap->R_RegisterShader("gfx/effects/sabers/ot_rgb_glow"); // Niksata Edit
 
+	//sfx Mcquarrie // Niksata Edit
+	cgs.media.ShaderSaberBladeMcquarrie = trap->R_RegisterShader("SFX_Sabers/mcquarrie_rgb_blade"); // Niksata Edit
+	cgs.media.ShaderSaberBladeMcquarriered = trap->R_RegisterShader("SFX_Sabers/mcquarrie_red_blade"); // Niksata Edit
+	cgs.media.ShaderSaberBladeMcquarrieorange = trap->R_RegisterShader("SFX_Sabers/mcquarrie_orange_blade"); // Niksata Edit
+	cgs.media.ShaderSaberBladeMcquarrieyellow = trap->R_RegisterShader("SFX_Sabers/mcquarrie_yellow_blade"); // Niksata Edit
+	cgs.media.ShaderSaberBladeMcquarriegreen = trap->R_RegisterShader("SFX_Sabers/mcquarrie_green_blade"); // Niksata Edit
+	cgs.media.ShaderSaberBladeMcquarrieblue = trap->R_RegisterShader("SFX_Sabers/mcquarrie_blue_blade"); // Niksata Edit
+	cgs.media.ShaderSaberBladeMcquarriepurple = trap->R_RegisterShader("SFX_Sabers/mcquarrie_purple_blade"); // Niksata Edit
+	cgs.media.ShaderSaberBladeRGBMcquarrie = trap->R_RegisterShader("SFX_Sabers/mcquarrie_rgb_blade"); // Niksata Edit
+	cgs.media.redSaberGlowShaderMcquarrie = trap->R_RegisterShader("gfx/effects/sabers/mcquarrie_red_glow"); // Niksata Edit
+	cgs.media.orangeSaberGlowShaderMcquarrie = trap->R_RegisterShader("gfx/effects/sabers/mcquarrie_orange_glow"); // Niksata Edit
+	cgs.media.yellowSaberGlowShaderMcquarrie = trap->R_RegisterShader("gfx/effects/sabers/mcquarrie_yellow_glow"); // Niksata Edit
+	cgs.media.greenSaberGlowShaderMcquarrie = trap->R_RegisterShader("gfx/effects/sabers/mcquarrie_green_glow"); // Niksata Edit
+	cgs.media.blueSaberGlowShaderMcquarrie = trap->R_RegisterShader("gfx/effects/sabers/mcquarrie_blue_glow"); // Niksata Edit
+	cgs.media.purpleSaberGlowShaderMcquarrie = trap->R_RegisterShader("gfx/effects/sabers/mcquarrie_purple_glow"); // Niksata Edit
+	cgs.media.rgbSaberGlowShaderMcquarrie = trap->R_RegisterShader("gfx/effects/sabers/mcquarrie_rgb_glow"); // Niksata Edit
+
 	//rp
 	cgs.media.saberIgnitionFlare = trap->R_RegisterShaderNoMip( "gfx/effects/flare1" );
 #if _SHITTYLINEFX

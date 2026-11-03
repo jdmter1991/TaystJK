@@ -1700,6 +1700,23 @@ typedef struct cgMedia_s {
 	qhandle_t	purpleSaberGlowShaderOT;
 	qhandle_t	rgbSaberGlowShaderOT; // Niksata Edit
 
+	//sfx Mcquarrie // Niksata Edit
+	qhandle_t	ShaderSaberBladeMcquarrie;
+	qhandle_t	ShaderSaberBladeMcquarriered;
+	qhandle_t	ShaderSaberBladeMcquarrieorange;
+	qhandle_t	ShaderSaberBladeMcquarrieyellow;
+	qhandle_t	ShaderSaberBladeMcquarriegreen;
+	qhandle_t	ShaderSaberBladeMcquarrieblue;
+	qhandle_t	ShaderSaberBladeMcquarriepurple;
+	qhandle_t	ShaderSaberBladeRGBMcquarrie;
+	qhandle_t	redSaberGlowShaderMcquarrie;
+	qhandle_t	orangeSaberGlowShaderMcquarrie;
+	qhandle_t	yellowSaberGlowShaderMcquarrie;
+	qhandle_t	greenSaberGlowShaderMcquarrie;
+	qhandle_t	blueSaberGlowShaderMcquarrie;
+	qhandle_t	purpleSaberGlowShaderMcquarrie;
+	qhandle_t	rgbSaberGlowShaderMcquarrie; // Niksata Edit
+
 	//rp
 	qhandle_t saberIgnitionFlare;
 
