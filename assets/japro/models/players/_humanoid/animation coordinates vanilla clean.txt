@@ -1,0 +1,280 @@
+BOTH_SABERDESANN_STANCE 12482	2	-1	60 - overhead stance
+
+BOTH_STAND2   			47650	1	-1	20 - warrior stance single
+
+BOTH_SABERDUAL_STANCE	47651	1	-1	20 - warrior stance dual
+
+
+//BOTH_FLIP_F         	47652	23	-1	30 - force charge
+//BOTH_LAND1          	47675   11	-1	20 - force charge attack
+//BOTH_FLIP_F		47936  	37  	-1  	30 - palpatine charge start
+//BOTH_LAND1 		47973  	6  	-1 	30 - palpatine charge end
+BOTH_FLIP_F		47936  	33  	-1 	30 - Palpatine Charge
+BOTH_LAND1          	47675   11	-1	20 - force charge attack
+
+BOTH_A5_SPECIAL     	47686   30	-1	30 - smash
+
+
+BOTH_A6_SABERPROTECT    47686   30	-1	30 - dual smash
+
+BOTH_A6_TR_BL 	     	47686   30	-1	30 - dual smash
+BOTH_B6_TR___ 	     	47686   1	-1	30 - dual smash
+BOTH_R6_BL_S1 	     	47686   1	-1	30 - dual smash
+BOTH_S6_S1_TR 	     	47686   1	-1	30 - dual smash
+
+
+BOTH_A2_SPECIAL			47716   44	-1	30 - assault
+
+
+BOTH_A4_SPECIAL			47759	30	-1	30 - vicious slash
+
+
+BOTH_LUNGE2_B__T_ 		47790	34	-1	30 - obliterate
+
+
+BOTH_A1_SPECIAL			47824   31	-1	30 - aegis assault
+
+
+BOTH_A1_TR_BL 			47855	42  -1  30 - crushing blow
+BOTH_B1_TR___ 			47855	1   -1  30 - crushing blow
+BOTH_R1_BL_S1       	47891	1	-1	30 - crushing blow
+BOTH_S1_S1_TR       	47855	1	-1	30 - crushing blow
+
+BOTH_SABERFAST_STANCE   47896   1	-1 	30 - jedi guardian stance
+
+BOTH_A6_SABERPROTECT	47897 	39	-1	30 - dual furious strike
+
+BOTH_A6_TR_BL 	     	47897 	39	-1	30 - dual furious strike
+BOTH_B6_TR___ 	     	47897 	1	-1	30 - dual furious strike
+BOTH_R6_BL_S1 	     	47897 	1	-1	30 - dual furious strike
+BOTH_S6_S1_TR 	     	47897 	1	-1	30 - dual furious strike
+
+BOTH_FORCELEAP2_T__B_	47936  	43  -1  30 - Palpatine Charge
+
+
+BOTH_A6_TR_BL 			47979	41  -1  30 - annihilate
+BOTH_B6_TR___ 			47979	1   -1  30 - annihilate
+BOTH_R6_BL_S6       	47979	1	-1	30 - annihilate
+BOTH_S6_S6_TR       	47979	1	-1	30 - annihilate
+
+BOTH_T1__R__L       	48020	13	-1	20 - Palpatine l_r turn
+BOTH_R1__L_S1       	48033	1	-1	20 - Palpatine l_r turn
+BOTH_T3_BR__L       	48020	14	-1	20 - Palpatine l_r turn
+
+BOTH_SABERSLOW_STANCE	48035	1	1	30 - Palpatine stance1
+BOTH_A3_SPECIAL			48036	38	0	30 - Palpatine stab
+
+BOTH_A3__R__L			48074	29	0	30 - Palpatine r_l
+BOTH_S3_S1__R			48074	1	0	30 - Palpatine r_l
+BOTH_R3__L_S1 			48074	1	0	30 - Palpatine r_l
+
+BOTH_SABERPALPATINE_STANCE 	48103 	1	1	30 - Palpatine overhead + Palpatine stance2
+BOTH_A3_T__B_       	48104	41	1	35 - Palpatine overhead + Palpatine stance2
+BOTH_S3_S1_T_       	48104	1	1	30 - Palpatine overhead + Palpatine stance2
+BOTH_R3_B__S1       	48104	1	1	30 - Palpatine overhead + Palpatine stance2
+
+BOTH_A3_BR_TL			48145 	18	1 	30 - Palpatine br_tl
+
+BOTH_A3_TL_BR			48163	19	1	30 - Palpatine l_r
+
+BOTH_A3_BL_TR 			48182	14	1	30 - Palpatine tl_br
+BOTH_R3_BR_S1       	48182	1	1	30 - Palpatine tl_br
+
+BOTH_A3_TR_BL			48196	14(19)	1	20 - Palpatine tr_bl
+BOTH_R3_BL_S1			48210	5	1	20 - Palpatine tr_bl
+BOTH_S3_S1_TR			48196	1	1	20 - Palpatine tr_bl
+
+BOTH_A3__L__R			48215	24(40) 	1	35	- Palpatine t_rl
+BOTH_R3__R_S1       	48215	1 	1	30	- Palpatine t_rl
+BOTH_S3_S1__L			48215	1 	1	30	- Palpatine t_rl
+
+
+
+Palpatine saber style
+BOTH_A3_T__B_       	48123	15	1	30 - Palpatine overhead + Palpatine stance2
+BOTH_S3_S1_T_       	48104	19	1	30 - Palpatine overhead + Palpatine stance2
+BOTH_R3_B__S1       	48138	9	1	30 - Palpatine overhead + Palpatine stance2
+
+BOTH_A3_TR_BL			48198	8	1	20 - Palpatine tr_bl
+BOTH_R3_BL_S1			48206	9	1	20 - Palpatine tr_bl
+BOTH_S3_S1_TR			48196	2	1	20 - Palpatine tr_bl
+
+BOTH_A3__L__R			48221	12 	1	30	- Palpatine t_rl
+BOTH_R3__R_S1       	48233	6 	1	30	- Palpatine t_rl
+BOTH_S3_S1__L			48215	6 	1	30	- Palpatine t_rl
+
+
+
+---- sje2019 23.04.2019 coordinates ----
+first frame - 48931 (1282 difference)
+
+BOTH_SABERDESANN_STANCE 12482	2	-1	60 - overhead stance
+
+BOTH_STAND2   			48932	1	-1	20 - warrior stance single
+
+BOTH_SABERDUAL_STANCE	48933	1	-1	20 - warrior stance dual
+
+
+BOTH_FLIP_F         	48934	23	-1	30 - force charge
+BOTH_LAND1          	48957   11	-1	20 - force charge attack
+
+
+BOTH_A2_SPECIAL     	48968   30	-1	30 - smash
+
+
+BOTH_A6_SABERPROTECT    48968   30	-1	30 - dual smash
+
+BOTH_A6_TR_BL 	     	48968   30	-1	30 - dual smash
+BOTH_B6_TR___ 	     	48968   1	-1	30 - dual smash
+BOTH_R6_BL_S1 	     	48968   1	-1	30 - dual smash
+BOTH_S6_S1_TR 	     	48968   1	-1	30 - dual smash
+
+
+BOTH_A5_SPECIAL			48998   44	-1	25 - assault
+
+
+BOTH_A4_SPECIAL			49041	30	-1	30 - vicious slash
+
+
+BOTH_LUNGE2_B__T_ 		49072	34	-1	30 - obliterate
+
+
+BOTH_A1_SPECIAL			49106   31	-1	25 - aegis assault
+
+
+BOTH_A1_TR_BL 			49137	42  -1  30 - crushing blow
+BOTH_B1_TR___ 			49137	1   -1  30 - crushing blow
+BOTH_R1_BL_S1       	49173	1	-1	30 - crushing blow
+BOTH_S1_S1_TR       	49137	1	-1	30 - crushing blow
+
+BOTH_SABERFAST_STANCE   49178   1	-1 	30 - jedi guardian stance
+
+BOTH_A6_SABERPROTECT	49179 	39	-1	30 - dual furious strike
+
+BOTH_A6_TR_BL 	     	49179 	39	-1	30 - dual furious strike
+BOTH_B6_TR___ 	     	49179 	1	-1	30 - dual furious strike
+BOTH_R6_BL_S1 	     	49179 	1	-1	30 - dual furious strike
+BOTH_S6_S1_TR 	     	49179 	1	-1	30 - dual furious strike
+
+BOTH_FORCELEAP2_T__B_	49218  	43  -1  30 - Palpatine Charge
+
+
+BOTH_A6_TR_BL 			49261	41  -1  30 - annihilate
+BOTH_B6_TR___ 			49261	1   -1  30 - annihilate
+BOTH_R6_BL_S6       	49261	1	-1	30 - annihilate
+BOTH_S6_S6_TR       	49261	1	-1	30 - annihilate
+
+BOTH_T1__R__L       	49302	13	-1	20 - Palpatine l_r turn
+BOTH_R1__L_S1       	49315	1	-1	20 - Palpatine l_r turn
+BOTH_T3_BR__L       	49302	14	-1	25 - Palpatine l_r turn
+
+BOTH_SABERSLOW_STANCE	49317	1	1	30 - Palpatine stance1
+BOTH_A3_SPECIAL			49318	44	0	30 - Palpatine stab
+
+BOTH_A3__R__L			49362	29	0	30 - Palpatine r_l
+BOTH_S3_S1__R			49362	1	0	30 - Palpatine r_l
+BOTH_R3__L_S1 			49362	1	0	30 - Palpatine r_l
+
+BOTH_SABERPALPATINE_STANCE 	49391 	1	1	30 - Palpatine overhead + Palpatine stance2
+BOTH_A3_T__B_       	49412	21(41)	1	35 - Palpatine overhead + Palpatine stance2
+BOTH_S3_S1_T_       	49392	20	1	30 - Palpatine overhead + Palpatine stance2
+BOTH_R3_B__S1       	49432	1	1	30 - Palpatine overhead + Palpatine stance2
+
+BOTH_A3_BR_TL			49433 	18	1 	30 - Palpatine br_tl
+
+BOTH_A3_TL_BR			49451	19	1	30 - Palpatine l_r
+
+BOTH_A3_BL_TR 			49470	14	1	30 - Palpatine tl_br
+BOTH_R3_BR_S1       	49470	1	1	30 - Palpatine tl_br
+
+BOTH_A3_TR_BL			49484	14(19)	1	20 - Palpatine tr_bl
+BOTH_R3_BL_S1			49498	5	1	30 - Palpatine tr_bl
+BOTH_S3_S1_TR			49484	1	1	30 - Palpatine tr_bl
+
+BOTH_A3__L__R			49503	24(40) 	1	35	- Palpatine t_rl
+BOTH_R3__R_S1       	49503	1 	1	30	- Palpatine t_rl
+BOTH_S3_S1__L			49503	1 	1	30	- Palpatine t_rl
+
+BOTH_SABERPALPATINE_STANCE 	49543 	1	1	30 - Palpatine overhead alternate + Palpatine stance2
+BOTH_A3_T__B_       	49563	21(41)	1	35 - Palpatine overhead alternate + Palpatine stance2
+BOTH_S3_S1_T_       	49544	20	1	30 - Palpatine overhead alternate + Palpatine stance2
+BOTH_R3_B__S1       	49583	1	1	30 - Palpatine overhead alternate + Palpatine stance2
+
+
+-----------------------------------------
+--Sith Warrior style medium--
+
+BOTH_A2__R__L       	48998	15	-1	25
+BOTH_S2_S1__R       	48998	1	-1	20
+BOTH_R2__L_S1       	49012	1	-1	20
+
+BOTH_A2__L__R       	49013	13	-1	25
+BOTH_S2_S1__L      		49013	1	-1	20 
+BOTH_R2__R_S1       	49025	1	-1	20
+
+BOTH_A2_T__B_       	49026	16	-1	25
+BOTH_R2_B__S1       	49041	1	-1	20
+BOTH_S2_S1_T_       	49026	1	-1	20 
+
+-BOTH_A2_TL_BR			48974	13	-1	30
+-BOTH_R2_TR_S1       	48987	11	-1	30
+-BOTH_S2_S1_TL       	48968	6	-1	30 
+
+BOTH_S2_S1_TR	49137	14	-1	30
+BOTH_A2_TR_BL	49151	10	-1	30
+BOTH_R2_BL_S1	49161	18	-1	30
+
+-BOTH_S2_S1_BR	49106	4	-1	20
+-BOTH_A2_BR_TL	49110	5	-1	20	
+-BOTH_R2_BL_S1	49114	1	-1	20
+
+-BOTH_S2_S1_BL	49115	3	-1	20
+-BOTH_A2_BL_TR	49118	19	-1	20
+-BOTH_R2_BR_S1	49136	1	-1	20
+
+BOTH_S2_S1_BR	49106	4	-1	20
+BOTH_A2_BR_TL	49110	10	-1	20	
+BOTH_R2_BL_S1	49119	1	-1	20
+
+BOTH_S2_S1_BL	49111	3	-1	20
+BOTH_A2_BL_TR	49114	22	-1	20
+BOTH_R2_BR_S1	49136	1	-1	20
+
+--Sith Warrior style desann--
+
+BOTH_A4__R__L       	48998	15	-1	30
+BOTH_S4_S1__R       	48998	1	-1	30
+BOTH_R4__L_S1       	49012	1	-1	30
+
+BOTH_A4__L__R       	49013	13	-1	30
+BOTH_S4_S1__L      		49013	1	-1	30 
+BOTH_R4__R_S1       	49025	1	-1	30
+
+BOTH_A4_T__B_       	49026	16	-1	30
+BOTH_R4_B__S1       	49041	1	-1	30
+BOTH_S4_S1_T_       	49026	1	-1	30 
+
+-BOTH_A2_TL_BR			48974	13	-1	30
+-BOTH_R2_TR_S1       	48987	11	-1	30
+-BOTH_S2_S1_TL       	48968	6	-1	30 
+
+BOTH_S4_S1_TR	49137	14	-1	30
+BOTH_A4_TR_BL	49151	10	-1	30
+BOTH_R4_BL_S1	49161	18	-1	30
+
+-BOTH_S2_S1_BR	49106	4	-1	20
+-BOTH_A2_BR_TL	49110	5	-1	20	
+-BOTH_R2_BL_S1	49114	1	-1	20
+
+-BOTH_S2_S1_BL	49115	3	-1	20
+-BOTH_A2_BL_TR	49118	19	-1	20
+-BOTH_R2_BR_S1	49136	1	-1	20
+
+BOTH_S4_S1_BR	49106	4	-1	25
+BOTH_A4_BR_TL	49110	10	-1	25	
+BOTH_R4_BL_S1	49119	1	-1	20
+
+BOTH_S4_S1_BL	49111	3	-1	25
+BOTH_A4_BL_TR	49114	22	-1	25
+BOTH_R4_BR_S1	49136	1	-1	20
+-----------------------------------------
