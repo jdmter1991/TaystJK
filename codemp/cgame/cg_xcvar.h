@@ -424,8 +424,8 @@ XCVAR_DEF( cg_SFXSabersGlowSizeMcquarrie,		"0.7",					NULL,					CVAR_ARCHIVE ) /
 XCVAR_DEF( cg_SFXSabersCoreSize,				"1",					NULL,					CVAR_ARCHIVE ) // Niksata Edit
 XCVAR_DEF( cg_SFXSabersCoreSizeTPM,				"1",					NULL,					CVAR_ARCHIVE ) // Niksata Edit
 XCVAR_DEF( cg_SFXSabersCoreSizeAhsoka,			"1",					NULL,					CVAR_ARCHIVE ) // Niksata Edit
-XCVAR_DEF( cg_SFXSabersCoreSizeOT,				"1",					NULL,					CVAR_ARCHIVE ) // Niksata Edit
-XCVAR_DEF( cg_SFXSabersCoreSizeMcquarrie,		"1.6",					NULL,					CVAR_ARCHIVE ) // Niksata Edit
+XCVAR_DEF( cg_SFXSabersCoreSizeOT,				"1.1",					NULL,					CVAR_ARCHIVE ) // Niksata Edit
+XCVAR_DEF( cg_SFXSabersCoreSizeMcquarrie,		"1.7",					NULL,					CVAR_ARCHIVE ) // Niksata Edit
 XCVAR_DEF( cg_SFXSabersTPMCore,					"1",					NULL,					CVAR_ARCHIVE ) // Niksata Edit
 XCVAR_DEF( cg_SFXSabersOTrestored,				"1",					NULL,					CVAR_ARCHIVE ) // Niksata Edit
 XCVAR_DEF( cg_disruptorMainTime,				"150",					NULL,					CVAR_ARCHIVE )	//from smod
