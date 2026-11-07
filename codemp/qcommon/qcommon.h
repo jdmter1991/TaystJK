@@ -126,11 +126,11 @@ NET
 
 #define	MAX_PACKET_USERCMDS		32		// max number of usercmd_t in a packet
 
-#define	MAX_SNAPSHOT_ENTITIES	256
+#define	MAX_SNAPSHOT_ENTITIES	512 // Niksata Edit
 
 #define	PORT_ANY			-1
 
-#define	MAX_RELIABLE_COMMANDS	256			// max string commands buffered for restransmit // Niksata Edit
+#define	MAX_RELIABLE_COMMANDS	512			// max string commands buffered for restransmit // Niksata Edit
 
 typedef enum {
 	NS_CLIENT,

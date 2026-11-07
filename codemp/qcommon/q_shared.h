@@ -905,7 +905,7 @@ typedef enum {
 #define	MAX_LOGICENTITIES	3072
 #define	MAX_ENTITIESTOTAL	(MAX_GENTITIES+MAX_LOGICENTITIES)
 
-#define	GENTITYNUM_BITS	10		// don't need to send any more
+#define	GENTITYNUM_BITS	11		// don't need to send any more // Niksata Edit
 #define	MAX_GENTITIES	(1<<GENTITYNUM_BITS)
 
 //I am reverting. I guess. For now.
